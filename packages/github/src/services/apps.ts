@@ -415,6 +415,7 @@ export interface CreateFromManifestResponsePermissions {
   metadata?: string;
   contents?: string;
   deployments?: string;
+  [key: string]: unknown;
 }
 /** The list of events for the GitHub app. Note that the `installation_target`, `security_advisory`, and `meta` events are not included because they are global events and not specific to an installation. */
 export type CreateFromManifestResponseEventsList = Array<string>;
@@ -3087,13 +3088,16 @@ function __c50(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
-        S.Struct({
-          issues: S.optional(S.String),
-          checks: S.optional(S.String),
-          metadata: S.optional(S.String),
-          contents: S.optional(S.String),
-          deployments: S.optional(S.String),
-        }),
+        S.StructWithRest(
+          S.Struct({
+            issues: S.optional(S.String),
+            checks: S.optional(S.String),
+            metadata: S.optional(S.String),
+            contents: S.optional(S.String),
+            deployments: S.optional(S.String),
+          }),
+          [S.Record(S.String, S.Unknown)],
+        ),
       ).annotate({ identifier: "CreateFromManifestResponsePermissions" });
   }
 }

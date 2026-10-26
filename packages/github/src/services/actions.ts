@@ -3686,6 +3686,7 @@ export interface NullableIntegrationPermissions {
   metadata?: string;
   contents?: string;
   deployments?: string;
+  [key: string]: unknown;
 }
 /** The list of events for the GitHub app. Note that the `installation_target`, `security_advisory`, and `meta` events are not included because they are global events and not specific to an installation. */
 export type NullableIntegrationEventsList = Array<string>;
@@ -10088,13 +10089,16 @@ function __c95(j: number): any {
       ).annotate({ identifier: "ReviewPendingDeploymentsForRunRequest" });
     case 1:
       return S.suspend(() =>
-        S.Struct({
-          issues: S.optional(S.String),
-          checks: S.optional(S.String),
-          metadata: S.optional(S.String),
-          contents: S.optional(S.String),
-          deployments: S.optional(S.String),
-        }),
+        S.StructWithRest(
+          S.Struct({
+            issues: S.optional(S.String),
+            checks: S.optional(S.String),
+            metadata: S.optional(S.String),
+            contents: S.optional(S.String),
+            deployments: S.optional(S.String),
+          }),
+          [S.Record(S.String, S.Unknown)],
+        ),
       ).annotate({ identifier: "NullableIntegrationPermissions" });
     case 2:
       return S.suspend(() =>

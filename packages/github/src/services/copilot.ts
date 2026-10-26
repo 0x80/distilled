@@ -356,6 +356,7 @@ export interface CopilotOrganizationDetails {
   seat_management_setting: CopilotOrganizationDetailsSeatManagementSetting;
   /** The Copilot plan of the organization, or the parent enterprise, when applicable. */
   plan_type?: CopilotOrganizationDetailsPlanType;
+  [key: string]: unknown;
 }
 export interface GetCopilotSeatDetailsForUserRequest {
   /** The organization name. The name is not case sensitive. */
@@ -1831,15 +1832,18 @@ function __c20(j: number): any {
       ).annotate({ identifier: "CopilotOrganizationSeatBreakdown" });
     case 2:
       return S.suspend(() =>
-        S.Struct({
-          seat_breakdown: __S(321, __c20, 1),
-          public_code_suggestions: S.String,
-          ide_chat: S.optional(S.String),
-          platform_chat: S.optional(S.String),
-          cli: S.optional(S.String),
-          seat_management_setting: S.String,
-          plan_type: S.optional(S.String),
-        }),
+        S.StructWithRest(
+          S.Struct({
+            seat_breakdown: __S(321, __c20, 1),
+            public_code_suggestions: S.String,
+            ide_chat: S.optional(S.String),
+            platform_chat: S.optional(S.String),
+            cli: S.optional(S.String),
+            seat_management_setting: S.String,
+            plan_type: S.optional(S.String),
+          }),
+          [S.Record(S.String, S.Unknown)],
+        ),
       ).annotate({ identifier: "CopilotOrganizationDetails" });
   }
 }

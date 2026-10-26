@@ -143,6 +143,7 @@ export interface IntegrationPermissions {
   metadata?: string;
   contents?: string;
   deployments?: string;
+  [key: string]: unknown;
 }
 /** The list of events for the GitHub app. Note that the `installation_target`, `security_advisory`, and `meta` events are not included because they are global events and not specific to an installation. */
 export type IntegrationEventsList = Array<string>;
@@ -624,6 +625,10 @@ export type CodeownersErrorsErrorsList = Array<CodeownersErrorsErrorsItem>;
 export interface CodeownersErrors {
   errors: CodeownersErrorsErrorsList;
 }
+export type CompareCommitsRequestAccept =
+  | "application/vnd.github+json"
+  | "application/vnd.github.diff"
+  | "application/vnd.github.patch";
 export interface CompareCommitsRequest {
   /** The account owner of the repository. The name is not case sensitive. */
   owner: string;
@@ -635,6 +640,8 @@ export interface CompareCommitsRequest {
   page?: number;
   /** The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api)." */
   per_page?: number;
+  /** A media type that returns text instead of JSON: `application/vnd.github.diff`, `application/vnd.github.patch`. */
+  accept?: CompareCommitsRequestAccept | (string & {});
 }
 /** Metaproperties for Git author/committer information. */
 export interface NullableGitUser {
@@ -731,6 +738,8 @@ export interface CommitComparison {
   commits: CommitComparisonCommitsList;
   files?: CommitComparisonFilesList;
 }
+export type CompareCommitsResponseBody = CommitComparison | string;
+export type CompareCommitsResponse = CompareCommitsResponseBody;
 export type CreateAttestationRequestBundleVerificationMaterialMap = {
   [key: string]: unknown | undefined;
 };
@@ -4003,6 +4012,10 @@ export type RepositoryRuleDetailed =
   | RepositoryRuleDetailedCase22;
 export type GetBranchRulesResponseBodyList = Array<RepositoryRuleDetailed>;
 export type GetBranchRulesResponse = GetBranchRulesResponseBodyList;
+export interface GetByIdRequest {
+  /** The unique identifier of the repository. */
+  id: number;
+}
 export type GetClonesRequestPer = "day" | "week";
 export interface GetClonesRequest {
   /** The account owner of the repository. The name is not case sensitive. */
@@ -4117,6 +4130,11 @@ export interface CombinedCommitStatus {
   commit_url: string;
   url: string;
 }
+export type GetCommitRequestAccept =
+  | "application/vnd.github+json"
+  | "application/vnd.github.diff"
+  | "application/vnd.github.patch"
+  | "application/vnd.github.sha";
 export interface GetCommitRequest {
   /** The account owner of the repository. The name is not case sensitive. */
   owner: string;
@@ -4128,7 +4146,11 @@ export interface GetCommitRequest {
   page?: number;
   /** The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api)." */
   per_page?: number;
+  /** A media type that returns text instead of JSON: `application/vnd.github.diff`, `application/vnd.github.patch`, `application/vnd.github.sha`. */
+  accept?: GetCommitRequestAccept | (string & {});
 }
+export type GetCommitResponseBody = Commit | string;
+export type GetCommitResponse = GetCommitResponseBody;
 export interface GetCommitActivityStatsRequest {
   /** The account owner of the repository. The name is not case sensitive. */
   owner: string;
@@ -6142,6 +6164,8 @@ export interface UpdateRequest {
   allow_forking?: boolean;
   /** Either `true` to require contributors to sign off on web-based commits, or `false` to not require contributors to sign off on web-based commits. */
   web_commit_signoff_required?: boolean;
+  /** Whether GitHub Discussions are enabled for the repository. */
+  has_discussions?: boolean;
 }
 /** **Closing down notice**: The list of status checks to require in order to merge into this branch. If any of these checks have recently been set by a particular GitHub App, they will be required to come from that app in future for the branch to merge. Use `checks` instead of `contexts` for more fine-grained control. */
 export type UpdateBranchProtectionRequestRequiredStatusChecksContextsList = Array<string>;
@@ -6159,7 +6183,7 @@ export interface UpdateBranchProtectionRequestRequiredStatusChecks {
   /** Require branches to be up to date before merging. */
   strict: boolean;
   /** **Closing down notice**: The list of status checks to require in order to merge into this branch. If any of these checks have recently been set by a particular GitHub App, they will be required to come from that app in future for the branch to merge. Use `checks` instead of `contexts` for more fine-grained control. */
-  contexts: UpdateBranchProtectionRequestRequiredStatusChecksContextsList;
+  contexts?: UpdateBranchProtectionRequestRequiredStatusChecksContextsList;
   /** The list of status checks to require in order to merge into this branch. */
   checks?: UpdateBranchProtectionRequestRequiredStatusChecksChecksList;
 }
@@ -6607,8 +6631,8 @@ export const acceptInvitationForAuthenticatedUser: API.OperationMethod<
   AcceptInvitationForAuthenticatedUserError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3120, __c195, 0) as any as S.Schema<AcceptInvitationForAuthenticatedUserRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<AcceptInvitationForAuthenticatedUserResponse>,
+  input: __S(3088, __c193, 0) as any as S.Schema<AcceptInvitationForAuthenticatedUserRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<AcceptInvitationForAuthenticatedUserResponse>,
   errors: [Forbidden, NotFound, Conflict],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6624,8 +6648,8 @@ export const addAppAccessRestrictions: API.OperationMethod<
   AddAppAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3312, __c207, 0) as any as S.Schema<AddAppAccessRestrictionsRequest>,
-  output: __S(3360, __c210, 0) as any as S.Schema<AddAppAccessRestrictionsResponse>,
+  input: __S(3280, __c205, 0) as any as S.Schema<AddAppAccessRestrictionsRequest>,
+  output: __S(3328, __c208, 0) as any as S.Schema<AddAppAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6641,8 +6665,8 @@ export const addCollaborator: API.OperationMethod<
   AddCollaboratorError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3552, __c222, 0) as any as S.Schema<AddCollaboratorRequest>,
-  output: __S(3584, __c224, 0) as any as S.Schema<RepositoryInvitation>,
+  input: __S(3520, __c220, 0) as any as S.Schema<AddCollaboratorRequest>,
+  output: __S(3552, __c222, 0) as any as S.Schema<RepositoryInvitation>,
   errors: [Forbidden, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6662,8 +6686,8 @@ export const addStatusCheckContexts: API.OperationMethod<
   AddStatusCheckContextsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3840, __c240, 0) as any as S.Schema<AddStatusCheckContextsRequest>,
-  output: __S(3856, __c241, 0) as any as S.Schema<AddStatusCheckContextsResponse>,
+  input: __S(3808, __c238, 0) as any as S.Schema<AddStatusCheckContextsRequest>,
+  output: __S(3824, __c239, 0) as any as S.Schema<AddStatusCheckContextsResponse>,
   errors: [Forbidden, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6679,8 +6703,8 @@ export const addTeamAccessRestrictions: API.OperationMethod<
   AddTeamAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4144, __c259, 0) as any as S.Schema<AddTeamAccessRestrictionsRequest>,
-  output: __S(4160, __c260, 0) as any as S.Schema<AddTeamAccessRestrictionsResponse>,
+  input: __S(4128, __c258, 0) as any as S.Schema<AddTeamAccessRestrictionsRequest>,
+  output: __S(4144, __c259, 0) as any as S.Schema<AddTeamAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6714,7 +6738,7 @@ export const cancelPagesDeployment: API.OperationMethod<
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
   input: __S(224, __c14, 0) as any as S.Schema<CancelPagesDeploymentRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<CancelPagesDeploymentResponse>,
+  output: __S(3104, __c194, 0) as any as S.Schema<CancelPagesDeploymentResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6748,7 +6772,7 @@ export const checkCollaborator: API.OperationMethod<
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
   input: __S(656, __c41, 0) as any as S.Schema<CheckCollaboratorRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<CheckCollaboratorResponse>,
+  output: __S(3104, __c194, 0) as any as S.Schema<CheckCollaboratorResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6799,7 +6823,7 @@ export const checkVulnerabilityAlerts: API.OperationMethod<
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
   input: __S(1248, __c78, 0) as any as S.Schema<CheckVulnerabilityAlertsRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<CheckVulnerabilityAlertsResponse>,
+  output: __S(3104, __c194, 0) as any as S.Schema<CheckVulnerabilityAlertsResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6827,19 +6851,27 @@ export const codeownersErrors2: API.OperationMethod<
 export type CompareCommitsError = NotFound | UnprocessableEntity | GithubOpError;
 /** Compare two commits Compares two commits against one another. You can compare refs (branches or tags) and commit SHAs in the same repository, or you can compare refs and commit SHAs that exist in different repositories within the same repository network, including fork branches. For more information about how to view a repository's network, see "[Understanding connections between repositories](https://docs.github.com/repositories/viewing-activity-and-data-for-your-repository/understanding-connections-between-repositories)." This endpoint is equivalent to running the `git log BASE..HEAD` command, but it returns commits in a different order. The `git log BASE..HEAD` command returns commits in reverse chronological order, whereas the API returns commits in chronological order. This endpoint supports the following custom media types. For more information, see "[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types)." - **`application/vnd.github.diff`**: Returns the diff of the commit. - **`application/vnd.github.patch`**: Returns the patch of the commit. Diffs with binary data will have no `patch` property. The API response includes details about the files that were changed between the two commits. This includes the status of the change (if a file was added, removed, modified, or renamed), and details of the change itself. For example, files with a `renamed` status have a `previous_filename` field showing the previous filename of the file, and files with a `modified` status have a `patch` field showing the changes made to the file. When calling this endpoint without any paging parameter (`per_page` or `page`), the returned list is limited to 250 commits, and the last commit in the list is the most recent of the entire comparison. **Working with large comparisons** To process a response with a large number of commits, use a query parameter (`per_page` or `page`) to paginate the results. When using pagination: - The list of changed files is only shown on the first page of results, and it includes up to 300 changed files for the entire comparison. - The results are returned in chronological order, but the last commit in the returned list may not be the most recent one in the entire set if there are more pages of results. For more information on working with pagination, see "[Using pagination in the REST API](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api)." **Signature verification object** The response will include a `verification` object that describes the result of verifying the commit's signature. The `verification` object includes the following fields: These are the possible values for `reason` in the `verification` object: */
 export const compareCommits: API.OperationMethod<
-  CompareCommitsRequest,
+  CompareCommitsRequest & { readonly accept?: "application/vnd.github+json" },
   CommitComparison,
   CompareCommitsError,
   GithubOpContext
-> = /*@__PURE__*/ API.make(() => ({
+> &
+  API.OperationMethod<
+    CompareCommitsRequest & {
+      readonly accept: "application/vnd.github.diff" | "application/vnd.github.patch";
+    },
+    string,
+    CompareCommitsError,
+    GithubOpContext
+  > = /*@__PURE__*/ API.make(() => ({
   input: __S(1616, __c101, 0) as any as S.Schema<CompareCommitsRequest>,
-  output: __S(1617, __c101, 1) as any as S.Schema<CommitComparison>,
+  output: __S(1617, __c101, 1) as any as S.Schema<CompareCommitsResponse>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
   telemetry: TELEMETRY,
   span: "CompareCommits",
-}));
+})) as any;
 
 export type CreateAttestationError = Forbidden | UnprocessableEntity | GithubOpError;
 /** Create an attestation Store an artifact attestation and associate it with a repository. The authenticated user must have write permission to the repository and, if using a fine-grained access token, the `attestations:write` permission is required. Artifact attestations are meant to be created using the [attest action](https://github.com/actions/attest). For more information, see our guide on [using artifact attestations to establish a build's provenance](https://docs.github.com/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds). */
@@ -6849,8 +6881,8 @@ export const createAttestation: API.OperationMethod<
   CreateAttestationError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1840, __c115, 0) as any as S.Schema<CreateAttestationRequest>,
-  output: __S(1841, __c115, 1) as any as S.Schema<CreateAttestationResponse>,
+  input: __S(1792, __c112, 0) as any as S.Schema<CreateAttestationRequest>,
+  output: __S(1793, __c112, 1) as any as S.Schema<CreateAttestationResponse>,
   errors: [Forbidden, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6866,8 +6898,8 @@ export const createAutolink: API.OperationMethod<
   CreateAutolinkError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2064, __c129, 0) as any as S.Schema<CreateAutolinkRequest>,
-  output: __S(2080, __c130, 0) as any as S.Schema<Autolink>,
+  input: __S(2016, __c126, 0) as any as S.Schema<CreateAutolinkRequest>,
+  output: __S(2032, __c127, 0) as any as S.Schema<Autolink>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6883,8 +6915,8 @@ export const createCommitComment: API.OperationMethod<
   CreateCommitCommentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2224, __c139, 0) as any as S.Schema<CreateCommitCommentRequest>,
-  output: __S(2256, __c141, 0) as any as S.Schema<CommitComment>,
+  input: __S(2192, __c137, 0) as any as S.Schema<CreateCommitCommentRequest>,
+  output: __S(2224, __c139, 0) as any as S.Schema<CommitComment>,
   errors: [Forbidden, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6900,8 +6932,8 @@ export const createCommitSignatureProtection: API.OperationMethod<
   CreateCommitSignatureProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2272, __c142, 0) as any as S.Schema<CreateCommitSignatureProtectionRequest>,
-  output: __S(2288, __c143, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
+  input: __S(2240, __c140, 0) as any as S.Schema<CreateCommitSignatureProtectionRequest>,
+  output: __S(2256, __c141, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6917,8 +6949,8 @@ export const createCommitStatus: API.OperationMethod<
   CreateCommitStatusError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2304, __c144, 0) as any as S.Schema<CreateCommitStatusRequest>,
-  output: __S(2320, __c145, 0) as any as S.Schema<Status>,
+  input: __S(2272, __c142, 0) as any as S.Schema<CreateCommitStatusRequest>,
+  output: __S(2288, __c143, 0) as any as S.Schema<Status>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6934,8 +6966,8 @@ export const createDeployKey: API.OperationMethod<
   CreateDeployKeyError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2336, __c146, 0) as any as S.Schema<CreateDeployKeyRequest>,
-  output: __S(2352, __c147, 0) as any as S.Schema<DeployKey>,
+  input: __S(2304, __c144, 0) as any as S.Schema<CreateDeployKeyRequest>,
+  output: __S(2320, __c145, 0) as any as S.Schema<DeployKey>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6951,8 +6983,8 @@ export const createDeployment: API.OperationMethod<
   CreateDeploymentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2368, __c148, 0) as any as S.Schema<CreateDeploymentRequest>,
-  output: __S(2384, __c149, 0) as any as S.Schema<Deployment>,
+  input: __S(2336, __c146, 0) as any as S.Schema<CreateDeploymentRequest>,
+  output: __S(2352, __c147, 0) as any as S.Schema<Deployment>,
   errors: [Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6968,8 +7000,8 @@ export const createDeploymentBranchPolicy: API.OperationMethod<
   CreateDeploymentBranchPolicyError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2416, __c151, 0) as any as S.Schema<CreateDeploymentBranchPolicyRequest>,
-  output: __S(2432, __c152, 0) as any as S.Schema<DeploymentBranchPolicy>,
+  input: __S(2384, __c149, 0) as any as S.Schema<CreateDeploymentBranchPolicyRequest>,
+  output: __S(2400, __c150, 0) as any as S.Schema<DeploymentBranchPolicy>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -6985,8 +7017,8 @@ export const createDeploymentProtectionRule: API.OperationMethod<
   CreateDeploymentProtectionRuleError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2448, __c153, 0) as any as S.Schema<CreateDeploymentProtectionRuleRequest>,
-  output: __S(2464, __c154, 0) as any as S.Schema<DeploymentProtectionRule>,
+  input: __S(2416, __c151, 0) as any as S.Schema<CreateDeploymentProtectionRuleRequest>,
+  output: __S(2432, __c152, 0) as any as S.Schema<DeploymentProtectionRule>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7002,8 +7034,8 @@ export const createDeploymentStatus: API.OperationMethod<
   CreateDeploymentStatusError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2496, __c156, 0) as any as S.Schema<CreateDeploymentStatusRequest>,
-  output: __S(2512, __c157, 0) as any as S.Schema<DeploymentStatus>,
+  input: __S(2464, __c154, 0) as any as S.Schema<CreateDeploymentStatusRequest>,
+  output: __S(2480, __c155, 0) as any as S.Schema<DeploymentStatus>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7019,8 +7051,8 @@ export const createDispatchEvent: API.OperationMethod<
   CreateDispatchEventError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2528, __c158, 0) as any as S.Schema<CreateDispatchEventRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<CreateDispatchEventResponse>,
+  input: __S(2496, __c156, 0) as any as S.Schema<CreateDispatchEventRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<CreateDispatchEventResponse>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7041,8 +7073,8 @@ export const createForAuthenticatedUser: API.OperationMethod<
   CreateForAuthenticatedUserError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2544, __c159, 0) as any as S.Schema<CreateForAuthenticatedUserRequest>,
-  output: __S(2577, __c161, 1) as any as S.Schema<FullRepository>,
+  input: __S(2512, __c157, 0) as any as S.Schema<CreateForAuthenticatedUserRequest>,
+  output: __S(2545, __c159, 1) as any as S.Schema<FullRepository>,
   errors: [BadRequest, Forbidden, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7063,8 +7095,8 @@ export const createFork: API.OperationMethod<
   CreateForkError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2624, __c164, 0) as any as S.Schema<CreateForkRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<CreateForkResponse>,
+  input: __S(2592, __c162, 0) as any as S.Schema<CreateForkRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<CreateForkResponse>,
   errors: [BadRequest, Forbidden, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7080,8 +7112,8 @@ export const createInOrg: API.OperationMethod<
   CreateInOrgError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2640, __c165, 0) as any as S.Schema<CreateInOrgRequest>,
-  output: __S(2577, __c161, 1) as any as S.Schema<FullRepository>,
+  input: __S(2608, __c163, 0) as any as S.Schema<CreateInOrgRequest>,
+  output: __S(2545, __c159, 1) as any as S.Schema<FullRepository>,
   errors: [Forbidden, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7097,8 +7129,8 @@ export const createOrgRuleset: API.OperationMethod<
   CreateOrgRulesetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2656, __c166, 0) as any as S.Schema<CreateOrgRulesetRequest>,
-  output: __S(2693, __c168, 5) as any as S.Schema<RepositoryRuleset>,
+  input: __S(2624, __c164, 0) as any as S.Schema<CreateOrgRulesetRequest>,
+  output: __S(2661, __c166, 5) as any as S.Schema<RepositoryRuleset>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7114,8 +7146,8 @@ export const createOrUpdateEnvironment: API.OperationMethod<
   CreateOrUpdateEnvironmentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2706, __c169, 2) as any as S.Schema<CreateOrUpdateEnvironmentRequest>,
-  output: __S(2722, __c170, 2) as any as S.Schema<Environment>,
+  input: __S(2674, __c167, 2) as any as S.Schema<CreateOrUpdateEnvironmentRequest>,
+  output: __S(2690, __c168, 2) as any as S.Schema<Environment>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7135,8 +7167,8 @@ export const createOrUpdateFileContents: API.OperationMethod<
   CreateOrUpdateFileContentsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2737, __c171, 1) as any as S.Schema<CreateOrUpdateFileContentsRequest>,
-  output: __S(2760, __c172, 8) as any as S.Schema<FileCommit>,
+  input: __S(2705, __c169, 1) as any as S.Schema<CreateOrUpdateFileContentsRequest>,
+  output: __S(2728, __c170, 8) as any as S.Schema<FileCommit>,
   errors: [NotFound, Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7156,8 +7188,8 @@ export const createPagesDeployment: API.OperationMethod<
   CreatePagesDeploymentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2768, __c173, 0) as any as S.Schema<CreatePagesDeploymentRequest>,
-  output: __S(2769, __c173, 1) as any as S.Schema<PageDeployment>,
+  input: __S(2736, __c171, 0) as any as S.Schema<CreatePagesDeploymentRequest>,
+  output: __S(2737, __c171, 1) as any as S.Schema<PageDeployment>,
   errors: [BadRequest, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7173,8 +7205,8 @@ export const createPagesSite: API.OperationMethod<
   CreatePagesSiteError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2785, __c174, 1) as any as S.Schema<CreatePagesSiteRequest>,
-  output: __S(2802, __c175, 2) as any as S.Schema<Page>,
+  input: __S(2753, __c172, 1) as any as S.Schema<CreatePagesSiteRequest>,
+  output: __S(2770, __c173, 2) as any as S.Schema<Page>,
   errors: [Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7190,8 +7222,8 @@ export const createRelease: API.OperationMethod<
   CreateReleaseError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2816, __c176, 0) as any as S.Schema<CreateReleaseRequest>,
-  output: __S(2864, __c179, 0) as any as S.Schema<Release>,
+  input: __S(2784, __c174, 0) as any as S.Schema<CreateReleaseRequest>,
+  output: __S(2832, __c177, 0) as any as S.Schema<Release>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7207,8 +7239,8 @@ export const createRepoRuleset: API.OperationMethod<
   CreateRepoRulesetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2880, __c180, 0) as any as S.Schema<CreateRepoRulesetRequest>,
-  output: __S(2693, __c168, 5) as any as S.Schema<RepositoryRuleset>,
+  input: __S(2848, __c178, 0) as any as S.Schema<CreateRepoRulesetRequest>,
+  output: __S(2661, __c166, 5) as any as S.Schema<RepositoryRuleset>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7224,8 +7256,8 @@ export const createUsingTemplate: API.OperationMethod<
   CreateUsingTemplateError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2912, __c182, 0) as any as S.Schema<CreateUsingTemplateRequest>,
-  output: __S(2577, __c161, 1) as any as S.Schema<FullRepository>,
+  input: __S(2880, __c180, 0) as any as S.Schema<CreateUsingTemplateRequest>,
+  output: __S(2545, __c159, 1) as any as S.Schema<FullRepository>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7241,8 +7273,8 @@ export const createWebhook: API.OperationMethod<
   CreateWebhookError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2928, __c183, 0) as any as S.Schema<CreateWebhookRequest>,
-  output: __S(2961, __c185, 1) as any as S.Schema<Hook>,
+  input: __S(2896, __c181, 0) as any as S.Schema<CreateWebhookRequest>,
+  output: __S(2929, __c183, 1) as any as S.Schema<Hook>,
   errors: [Forbidden, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7263,13 +7295,13 @@ export const customPropertiesForReposCreateOrUpdateRepositoryValues: API.Operati
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
   input: __S(
-    2976,
-    __c186,
+    2944,
+    __c184,
     0,
   ) as any as S.Schema<CustomPropertiesForReposCreateOrUpdateRepositoryValuesRequest>,
   output: __S(
-    3136,
-    __c196,
+    3104,
+    __c194,
     0,
   ) as any as S.Schema<CustomPropertiesForReposCreateOrUpdateRepositoryValuesResponse>,
   errors: [Forbidden, NotFound, UnprocessableEntity],
@@ -7288,13 +7320,13 @@ export const customPropertiesForReposGetRepositoryValues: API.OperationMethod<
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
   input: __S(
-    3008,
-    __c188,
+    2976,
+    __c186,
     0,
   ) as any as S.Schema<CustomPropertiesForReposGetRepositoryValuesRequest>,
   output: __S(
-    3009,
-    __c188,
+    2977,
+    __c186,
     1,
   ) as any as S.Schema<CustomPropertiesForReposGetRepositoryValuesResponse>,
   errors: [Forbidden, NotFound],
@@ -7316,8 +7348,8 @@ export const declineInvitationForAuthenticatedUser: API.OperationMethod<
   DeclineInvitationForAuthenticatedUserError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3024, __c189, 0) as any as S.Schema<DeclineInvitationForAuthenticatedUserRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeclineInvitationForAuthenticatedUserResponse>,
+  input: __S(2992, __c187, 0) as any as S.Schema<DeclineInvitationForAuthenticatedUserRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeclineInvitationForAuthenticatedUserResponse>,
   errors: [Forbidden, NotFound, Conflict],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7333,8 +7365,8 @@ export const Delete: API.OperationMethod<
   DeleteError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3040, __c190, 0) as any as S.Schema<DeleteRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteResponse>,
+  input: __S(3008, __c188, 0) as any as S.Schema<DeleteRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteResponse>,
   errors: [Forbidden, NotFound, Conflict],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7350,8 +7382,8 @@ export const deleteAccessRestrictions: API.OperationMethod<
   DeleteAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3056, __c191, 0) as any as S.Schema<DeleteAccessRestrictionsRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteAccessRestrictionsResponse>,
+  input: __S(3024, __c189, 0) as any as S.Schema<DeleteAccessRestrictionsRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteAccessRestrictionsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7367,8 +7399,8 @@ export const deleteAdminBranchProtection: API.OperationMethod<
   DeleteAdminBranchProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3072, __c192, 0) as any as S.Schema<DeleteAdminBranchProtectionRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteAdminBranchProtectionResponse>,
+  input: __S(3040, __c190, 0) as any as S.Schema<DeleteAdminBranchProtectionRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteAdminBranchProtectionResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7384,8 +7416,8 @@ export const deleteAnEnvironment: API.OperationMethod<
   DeleteAnEnvironmentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3088, __c193, 0) as any as S.Schema<DeleteAnEnvironmentRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteAnEnvironmentResponse>,
+  input: __S(3056, __c191, 0) as any as S.Schema<DeleteAnEnvironmentRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteAnEnvironmentResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7401,8 +7433,8 @@ export const deleteAutolink: API.OperationMethod<
   DeleteAutolinkError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3104, __c194, 0) as any as S.Schema<DeleteAutolinkRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteAutolinkResponse>,
+  input: __S(3072, __c192, 0) as any as S.Schema<DeleteAutolinkRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteAutolinkResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7418,8 +7450,8 @@ export const deleteBranchProtection: API.OperationMethod<
   DeleteBranchProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3152, __c197, 0) as any as S.Schema<DeleteBranchProtectionRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteBranchProtectionResponse>,
+  input: __S(3120, __c195, 0) as any as S.Schema<DeleteBranchProtectionRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteBranchProtectionResponse>,
   errors: [Forbidden],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7435,8 +7467,8 @@ export const deleteCommitComment: API.OperationMethod<
   DeleteCommitCommentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3168, __c198, 0) as any as S.Schema<DeleteCommitCommentRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteCommitCommentResponse>,
+  input: __S(3136, __c196, 0) as any as S.Schema<DeleteCommitCommentRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteCommitCommentResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7452,8 +7484,8 @@ export const deleteCommitSignatureProtection: API.OperationMethod<
   DeleteCommitSignatureProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3184, __c199, 0) as any as S.Schema<DeleteCommitSignatureProtectionRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteCommitSignatureProtectionResponse>,
+  input: __S(3152, __c197, 0) as any as S.Schema<DeleteCommitSignatureProtectionRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteCommitSignatureProtectionResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7469,8 +7501,8 @@ export const deleteDeployKey: API.OperationMethod<
   DeleteDeployKeyError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3200, __c200, 0) as any as S.Schema<DeleteDeployKeyRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteDeployKeyResponse>,
+  input: __S(3168, __c198, 0) as any as S.Schema<DeleteDeployKeyRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteDeployKeyResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7486,8 +7518,8 @@ export const deleteDeployment: API.OperationMethod<
   DeleteDeploymentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3216, __c201, 0) as any as S.Schema<DeleteDeploymentRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteDeploymentResponse>,
+  input: __S(3184, __c199, 0) as any as S.Schema<DeleteDeploymentRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteDeploymentResponse>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7503,8 +7535,8 @@ export const deleteDeploymentBranchPolicy: API.OperationMethod<
   DeleteDeploymentBranchPolicyError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3232, __c202, 0) as any as S.Schema<DeleteDeploymentBranchPolicyRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteDeploymentBranchPolicyResponse>,
+  input: __S(3200, __c200, 0) as any as S.Schema<DeleteDeploymentBranchPolicyRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteDeploymentBranchPolicyResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7520,8 +7552,8 @@ export const deleteFile: API.OperationMethod<
   DeleteFileError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3249, __c203, 1) as any as S.Schema<DeleteFileRequest>,
-  output: __S(2760, __c172, 8) as any as S.Schema<FileCommit>,
+  input: __S(3217, __c201, 1) as any as S.Schema<DeleteFileRequest>,
+  output: __S(2728, __c170, 8) as any as S.Schema<FileCommit>,
   errors: [NotFound, Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7537,8 +7569,8 @@ export const deleteInvitation: API.OperationMethod<
   DeleteInvitationError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3264, __c204, 0) as any as S.Schema<DeleteInvitationRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteInvitationResponse>,
+  input: __S(3232, __c202, 0) as any as S.Schema<DeleteInvitationRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteInvitationResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7554,8 +7586,8 @@ export const deleteOrgRuleset: API.OperationMethod<
   DeleteOrgRulesetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3280, __c205, 0) as any as S.Schema<DeleteOrgRulesetRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteOrgRulesetResponse>,
+  input: __S(3248, __c203, 0) as any as S.Schema<DeleteOrgRulesetRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteOrgRulesetResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7571,8 +7603,8 @@ export const deletePagesSite: API.OperationMethod<
   DeletePagesSiteError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3296, __c206, 0) as any as S.Schema<DeletePagesSiteRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeletePagesSiteResponse>,
+  input: __S(3264, __c204, 0) as any as S.Schema<DeletePagesSiteRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeletePagesSiteResponse>,
   errors: [NotFound, Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7588,8 +7620,8 @@ export const deletePullRequestReviewProtection: API.OperationMethod<
   DeletePullRequestReviewProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3392, __c212, 0) as any as S.Schema<DeletePullRequestReviewProtectionRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeletePullRequestReviewProtectionResponse>,
+  input: __S(3360, __c210, 0) as any as S.Schema<DeletePullRequestReviewProtectionRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeletePullRequestReviewProtectionResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7605,8 +7637,8 @@ export const deleteRelease: API.OperationMethod<
   DeleteReleaseError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3408, __c213, 0) as any as S.Schema<DeleteReleaseRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteReleaseResponse>,
+  input: __S(3376, __c211, 0) as any as S.Schema<DeleteReleaseRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteReleaseResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7622,8 +7654,8 @@ export const deleteReleaseAsset: API.OperationMethod<
   DeleteReleaseAssetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3424, __c214, 0) as any as S.Schema<DeleteReleaseAssetRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteReleaseAssetResponse>,
+  input: __S(3392, __c212, 0) as any as S.Schema<DeleteReleaseAssetRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteReleaseAssetResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7639,8 +7671,8 @@ export const deleteRepoRuleset: API.OperationMethod<
   DeleteRepoRulesetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3440, __c215, 0) as any as S.Schema<DeleteRepoRulesetRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteRepoRulesetResponse>,
+  input: __S(3408, __c213, 0) as any as S.Schema<DeleteRepoRulesetRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteRepoRulesetResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7656,8 +7688,8 @@ export const deleteWebhook: API.OperationMethod<
   DeleteWebhookError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3456, __c216, 0) as any as S.Schema<DeleteWebhookRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DeleteWebhookResponse>,
+  input: __S(3424, __c214, 0) as any as S.Schema<DeleteWebhookRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DeleteWebhookResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7673,8 +7705,8 @@ export const disableAutomatedSecurityFixes: API.OperationMethod<
   DisableAutomatedSecurityFixesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3472, __c217, 0) as any as S.Schema<DisableAutomatedSecurityFixesRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DisableAutomatedSecurityFixesResponse>,
+  input: __S(3440, __c215, 0) as any as S.Schema<DisableAutomatedSecurityFixesRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DisableAutomatedSecurityFixesResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7690,8 +7722,8 @@ export const disableDeploymentProtectionRule: API.OperationMethod<
   DisableDeploymentProtectionRuleError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3488, __c218, 0) as any as S.Schema<DisableDeploymentProtectionRuleRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DisableDeploymentProtectionRuleResponse>,
+  input: __S(3456, __c216, 0) as any as S.Schema<DisableDeploymentProtectionRuleRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DisableDeploymentProtectionRuleResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7707,8 +7739,8 @@ export const disableImmutableReleases: API.OperationMethod<
   DisableImmutableReleasesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3504, __c219, 0) as any as S.Schema<DisableImmutableReleasesRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DisableImmutableReleasesResponse>,
+  input: __S(3472, __c217, 0) as any as S.Schema<DisableImmutableReleasesRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DisableImmutableReleasesResponse>,
   errors: [Conflict],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7724,8 +7756,8 @@ export const disablePrivateVulnerabilityReporting: API.OperationMethod<
   DisablePrivateVulnerabilityReportingError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3520, __c220, 0) as any as S.Schema<DisablePrivateVulnerabilityReportingRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DisablePrivateVulnerabilityReportingResponse>,
+  input: __S(3488, __c218, 0) as any as S.Schema<DisablePrivateVulnerabilityReportingRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DisablePrivateVulnerabilityReportingResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7741,8 +7773,8 @@ export const disableVulnerabilityAlerts: API.OperationMethod<
   DisableVulnerabilityAlertsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3536, __c221, 0) as any as S.Schema<DisableVulnerabilityAlertsRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DisableVulnerabilityAlertsResponse>,
+  input: __S(3504, __c219, 0) as any as S.Schema<DisableVulnerabilityAlertsRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DisableVulnerabilityAlertsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7758,8 +7790,8 @@ export const downloadTarballArchive: API.OperationMethod<
   DownloadTarballArchiveError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3664, __c229, 0) as any as S.Schema<DownloadTarballArchiveRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DownloadTarballArchiveResponse>,
+  input: __S(3632, __c227, 0) as any as S.Schema<DownloadTarballArchiveRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DownloadTarballArchiveResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7775,8 +7807,8 @@ export const downloadZipballArchive: API.OperationMethod<
   DownloadZipballArchiveError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3680, __c230, 0) as any as S.Schema<DownloadZipballArchiveRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<DownloadZipballArchiveResponse>,
+  input: __S(3648, __c228, 0) as any as S.Schema<DownloadZipballArchiveRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<DownloadZipballArchiveResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7792,8 +7824,8 @@ export const enableAutomatedSecurityFixes: API.OperationMethod<
   EnableAutomatedSecurityFixesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3696, __c231, 0) as any as S.Schema<EnableAutomatedSecurityFixesRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<EnableAutomatedSecurityFixesResponse>,
+  input: __S(3664, __c229, 0) as any as S.Schema<EnableAutomatedSecurityFixesRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<EnableAutomatedSecurityFixesResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7809,8 +7841,8 @@ export const enableImmutableReleases: API.OperationMethod<
   EnableImmutableReleasesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3712, __c232, 0) as any as S.Schema<EnableImmutableReleasesRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<EnableImmutableReleasesResponse>,
+  input: __S(3680, __c230, 0) as any as S.Schema<EnableImmutableReleasesRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<EnableImmutableReleasesResponse>,
   errors: [Conflict],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7826,8 +7858,8 @@ export const enablePrivateVulnerabilityReporting: API.OperationMethod<
   EnablePrivateVulnerabilityReportingError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3728, __c233, 0) as any as S.Schema<EnablePrivateVulnerabilityReportingRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<EnablePrivateVulnerabilityReportingResponse>,
+  input: __S(3696, __c231, 0) as any as S.Schema<EnablePrivateVulnerabilityReportingRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<EnablePrivateVulnerabilityReportingResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7843,8 +7875,8 @@ export const enableVulnerabilityAlerts: API.OperationMethod<
   EnableVulnerabilityAlertsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3744, __c234, 0) as any as S.Schema<EnableVulnerabilityAlertsRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<EnableVulnerabilityAlertsResponse>,
+  input: __S(3712, __c232, 0) as any as S.Schema<EnableVulnerabilityAlertsRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<EnableVulnerabilityAlertsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7860,8 +7892,8 @@ export const generateReleaseNotes: API.OperationMethod<
   GenerateReleaseNotesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3760, __c235, 0) as any as S.Schema<GenerateReleaseNotesRequest>,
-  output: __S(3761, __c235, 1) as any as S.Schema<ReleaseNotesContent>,
+  input: __S(3728, __c233, 0) as any as S.Schema<GenerateReleaseNotesRequest>,
+  output: __S(3729, __c233, 1) as any as S.Schema<ReleaseNotesContent>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7873,8 +7905,8 @@ export type GetError = Forbidden | NotFound | GithubOpError;
 /** Get a repository The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository this repository was forked from, `source` is the ultimate source for the network. > [!NOTE] > - In order to see the `security_and_analysis` block for a repository you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see "[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization)." > - To view merge-related settings, you must have the `contents:read` and `contents:write` permissions. */
 export const get: API.OperationMethod<GetRequest, FullRepository, GetError, GithubOpContext> =
   /*@__PURE__*/ API.make(() => ({
-    input: __S(3776, __c236, 0) as any as S.Schema<GetRequest>,
-    output: __S(2577, __c161, 1) as any as S.Schema<FullRepository>,
+    input: __S(3744, __c234, 0) as any as S.Schema<GetRequest>,
+    output: __S(2545, __c159, 1) as any as S.Schema<FullRepository>,
     errors: [Forbidden, NotFound],
     protocol: GithubProtocol,
     retry: Retry.Retry,
@@ -7890,8 +7922,8 @@ export const getAccessRestrictions: API.OperationMethod<
   GetAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3792, __c237, 0) as any as S.Schema<GetAccessRestrictionsRequest>,
-  output: __S(3814, __c238, 6) as any as S.Schema<BranchRestrictionPolicy>,
+  input: __S(3760, __c235, 0) as any as S.Schema<GetAccessRestrictionsRequest>,
+  output: __S(3782, __c236, 6) as any as S.Schema<BranchRestrictionPolicy>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7907,8 +7939,8 @@ export const getAdminBranchProtection: API.OperationMethod<
   GetAdminBranchProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3824, __c239, 0) as any as S.Schema<GetAdminBranchProtectionRequest>,
-  output: __S(2288, __c143, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
+  input: __S(3792, __c237, 0) as any as S.Schema<GetAdminBranchProtectionRequest>,
+  output: __S(2256, __c141, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7924,8 +7956,8 @@ export const getAllDeploymentProtectionRules: API.OperationMethod<
   GetAllDeploymentProtectionRulesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3872, __c242, 0) as any as S.Schema<GetAllDeploymentProtectionRulesRequest>,
-  output: __S(3874, __c242, 2) as any as S.Schema<GetAllDeploymentProtectionRulesResponse>,
+  input: __S(3840, __c240, 0) as any as S.Schema<GetAllDeploymentProtectionRulesRequest>,
+  output: __S(3842, __c240, 2) as any as S.Schema<GetAllDeploymentProtectionRulesResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7941,8 +7973,8 @@ export const getAllEnvironments: API.OperationMethod<
   GetAllEnvironmentsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3888, __c243, 0) as any as S.Schema<GetAllEnvironmentsRequest>,
-  output: __S(3890, __c243, 2) as any as S.Schema<GetAllEnvironmentsResponse>,
+  input: __S(3856, __c241, 0) as any as S.Schema<GetAllEnvironmentsRequest>,
+  output: __S(3858, __c241, 2) as any as S.Schema<GetAllEnvironmentsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7958,8 +7990,8 @@ export const getAllStatusCheckContexts: API.OperationMethod<
   GetAllStatusCheckContextsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3904, __c244, 0) as any as S.Schema<GetAllStatusCheckContextsRequest>,
-  output: __S(3856, __c241, 0) as any as S.Schema<GetAllStatusCheckContextsResponse>,
+  input: __S(3872, __c242, 0) as any as S.Schema<GetAllStatusCheckContextsRequest>,
+  output: __S(3824, __c239, 0) as any as S.Schema<GetAllStatusCheckContextsResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7975,8 +8007,8 @@ export const getAllTopics: API.OperationMethod<
   GetAllTopicsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3920, __c245, 0) as any as S.Schema<GetAllTopicsRequest>,
-  output: __S(3936, __c246, 0) as any as S.Schema<Topic>,
+  input: __S(3888, __c243, 0) as any as S.Schema<GetAllTopicsRequest>,
+  output: __S(3904, __c244, 0) as any as S.Schema<Topic>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -7992,8 +8024,8 @@ export const getAppsWithAccessToProtectedBranch: API.OperationMethod<
   GetAppsWithAccessToProtectedBranchError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3952, __c247, 0) as any as S.Schema<GetAppsWithAccessToProtectedBranchRequest>,
-  output: __S(3360, __c210, 0) as any as S.Schema<GetAppsWithAccessToProtectedBranchResponse>,
+  input: __S(3920, __c245, 0) as any as S.Schema<GetAppsWithAccessToProtectedBranchRequest>,
+  output: __S(3328, __c208, 0) as any as S.Schema<GetAppsWithAccessToProtectedBranchResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8009,8 +8041,8 @@ export const getAutolink: API.OperationMethod<
   GetAutolinkError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3968, __c248, 0) as any as S.Schema<GetAutolinkRequest>,
-  output: __S(2080, __c130, 0) as any as S.Schema<Autolink>,
+  input: __S(3936, __c246, 0) as any as S.Schema<GetAutolinkRequest>,
+  output: __S(2032, __c127, 0) as any as S.Schema<Autolink>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8026,7 +8058,7 @@ export const getBranch: API.OperationMethod<
   GetBranchError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(3984, __c249, 0) as any as S.Schema<GetBranchRequest>,
+  input: __S(3952, __c247, 0) as any as S.Schema<GetBranchRequest>,
   output: __S(4001, __c250, 1) as any as S.Schema<BranchWithProtection>,
   errors: [NotFound],
   protocol: GithubProtocol,
@@ -8069,6 +8101,23 @@ export const getBranchRules: API.OperationMethod<
   span: "GetBranchRules",
 }));
 
+export type GetByIdError = Forbidden | NotFound | GithubOpError;
+/** Get a repository by id The repository's numeric id is stable across renames and transfers, so this finds a repository whose name changed. Undocumented in GitHub's REST reference, but served by the API. */
+export const getById: API.OperationMethod<
+  GetByIdRequest,
+  FullRepository,
+  GetByIdError,
+  GithubOpContext
+> = /*@__PURE__*/ API.make(() => ({
+  input: __S(4112, __c257, 0) as any as S.Schema<GetByIdRequest>,
+  output: __S(2545, __c159, 1) as any as S.Schema<FullRepository>,
+  errors: [Forbidden, NotFound],
+  protocol: GithubProtocol,
+  retry: Retry.Retry,
+  telemetry: TELEMETRY,
+  span: "GetById",
+}));
+
 export type GetClonesError = Forbidden | GithubOpError;
 /** Get repository clones Get the total number of clones and breakdown per day or week for the last 14 days. Timestamps are aligned to UTC midnight of the beginning of the day or week. Week begins on Monday. */
 export const getClones: API.OperationMethod<
@@ -8077,8 +8126,8 @@ export const getClones: API.OperationMethod<
   GetClonesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4112, __c257, 0) as any as S.Schema<GetClonesRequest>,
-  output: __S(4113, __c257, 1) as any as S.Schema<CloneTraffic>,
+  input: __S(4176, __c261, 0) as any as S.Schema<GetClonesRequest>,
+  output: __S(4177, __c261, 1) as any as S.Schema<CloneTraffic>,
   errors: [Forbidden],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8094,8 +8143,8 @@ export const getCodeFrequencyStats: API.OperationMethod<
   GetCodeFrequencyStatsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4192, __c262, 0) as any as S.Schema<GetCodeFrequencyStatsRequest>,
-  output: __S(4209, __c263, 1) as any as S.Schema<GetCodeFrequencyStatsResponse>,
+  input: __S(4208, __c263, 0) as any as S.Schema<GetCodeFrequencyStatsRequest>,
+  output: __S(4225, __c264, 1) as any as S.Schema<GetCodeFrequencyStatsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8111,8 +8160,8 @@ export const getCollaboratorPermissionLevel: API.OperationMethod<
   GetCollaboratorPermissionLevelError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4240, __c265, 0) as any as S.Schema<GetCollaboratorPermissionLevelRequest>,
-  output: __S(4241, __c265, 1) as any as S.Schema<RepositoryCollaboratorPermission>,
+  input: __S(4256, __c266, 0) as any as S.Schema<GetCollaboratorPermissionLevelRequest>,
+  output: __S(4257, __c266, 1) as any as S.Schema<RepositoryCollaboratorPermission>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8128,8 +8177,8 @@ export const getCombinedStatusForRef: API.OperationMethod<
   GetCombinedStatusForRefError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4272, __c267, 0) as any as S.Schema<GetCombinedStatusForRefRequest>,
-  output: __S(4275, __c267, 3) as any as S.Schema<CombinedCommitStatus>,
+  input: __S(4288, __c268, 0) as any as S.Schema<GetCombinedStatusForRefRequest>,
+  output: __S(4291, __c268, 3) as any as S.Schema<CombinedCommitStatus>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8140,19 +8189,30 @@ export const getCombinedStatusForRef: API.OperationMethod<
 export type GetCommitError = NotFound | Conflict | UnprocessableEntity | GithubOpError;
 /** Get a commit Returns the contents of a single commit reference. You must have `read` access for the repository to use this endpoint. > [!NOTE] > If there are more than 300 files in the commit diff and the default JSON media type is requested, the response will include pagination link headers for the remaining files, up to a limit of 3000 files. Each page contains the static commit information, and the only changes are to the file listing. This endpoint supports the following custom media types. For more information, see "[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types)." Pagination query parameters are not supported for these media types. - **`application/vnd.github.diff`**: Returns the diff of the commit. Larger diffs may time out and return a 5xx status code. - **`application/vnd.github.patch`**: Returns the patch of the commit. Diffs with binary data will have no `patch` property. Larger diffs may time out and return a 5xx status code. - **`application/vnd.github.sha`**: Returns the commit's SHA-1 hash. You can use this endpoint to check if a remote reference's SHA-1 hash is the same as your local reference's SHA-1 hash by providing the local SHA-1 reference as the ETag. **Signature verification object** The response will include a `verification` object that describes the result of verifying the commit's signature. The following fields are included in the `verification` object: These are the possible values for `reason` in the `verification` object: */
 export const getCommit: API.OperationMethod<
-  GetCommitRequest,
+  GetCommitRequest & { readonly accept?: "application/vnd.github+json" },
   Commit,
   GetCommitError,
   GithubOpContext
-> = /*@__PURE__*/ API.make(() => ({
-  input: __S(4288, __c268, 0) as any as S.Schema<GetCommitRequest>,
-  output: __S(1672, __c104, 8) as any as S.Schema<Commit>,
+> &
+  API.OperationMethod<
+    GetCommitRequest & {
+      readonly accept:
+        | "application/vnd.github.diff"
+        | "application/vnd.github.patch"
+        | "application/vnd.github.sha";
+    },
+    string,
+    GetCommitError,
+    GithubOpContext
+  > = /*@__PURE__*/ API.make(() => ({
+  input: __S(4304, __c269, 0) as any as S.Schema<GetCommitRequest>,
+  output: __S(4305, __c269, 1) as any as S.Schema<GetCommitResponse>,
   errors: [NotFound, Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
   telemetry: TELEMETRY,
   span: "GetCommit",
-}));
+})) as any;
 
 export type GetCommitActivityStatsError = GithubOpError;
 /** Get the last year of commit activity Returns the last year of commit activity grouped by week. The `days` array is a group of commits per day, starting on `Sunday`. */
@@ -8162,8 +8222,8 @@ export const getCommitActivityStats: API.OperationMethod<
   GetCommitActivityStatsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4304, __c269, 0) as any as S.Schema<GetCommitActivityStatsRequest>,
-  output: __S(4307, __c269, 3) as any as S.Schema<GetCommitActivityStatsResponse>,
+  input: __S(4320, __c270, 0) as any as S.Schema<GetCommitActivityStatsRequest>,
+  output: __S(4323, __c270, 3) as any as S.Schema<GetCommitActivityStatsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8179,8 +8239,8 @@ export const getCommitComment: API.OperationMethod<
   GetCommitCommentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4320, __c270, 0) as any as S.Schema<GetCommitCommentRequest>,
-  output: __S(2256, __c141, 0) as any as S.Schema<CommitComment>,
+  input: __S(4336, __c271, 0) as any as S.Schema<GetCommitCommentRequest>,
+  output: __S(2224, __c139, 0) as any as S.Schema<CommitComment>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8196,8 +8256,8 @@ export const getCommitSignatureProtection: API.OperationMethod<
   GetCommitSignatureProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4336, __c271, 0) as any as S.Schema<GetCommitSignatureProtectionRequest>,
-  output: __S(2288, __c143, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
+  input: __S(4352, __c272, 0) as any as S.Schema<GetCommitSignatureProtectionRequest>,
+  output: __S(2256, __c141, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8213,8 +8273,8 @@ export const getCommunityProfileMetrics: API.OperationMethod<
   GetCommunityProfileMetricsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4352, __c272, 0) as any as S.Schema<GetCommunityProfileMetricsRequest>,
-  output: __S(4355, __c272, 3) as any as S.Schema<CommunityProfile>,
+  input: __S(4368, __c273, 0) as any as S.Schema<GetCommunityProfileMetricsRequest>,
+  output: __S(4371, __c273, 3) as any as S.Schema<CommunityProfile>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8230,8 +8290,8 @@ export const getContent: API.OperationMethod<
   GetContentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4368, __c273, 0) as any as S.Schema<GetContentRequest>,
-  output: __S(4369, __c273, 1) as any as S.Schema<GetContentResponse>,
+  input: __S(4384, __c274, 0) as any as S.Schema<GetContentRequest>,
+  output: __S(4385, __c274, 1) as any as S.Schema<GetContentResponse>,
   errors: [Forbidden, NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8247,8 +8307,8 @@ export const getContributorsStats: API.OperationMethod<
   GetContributorsStatsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(4384, __c274, 0) as any as S.Schema<GetContributorsStatsRequest>,
-  output: __S(4389, __c274, 5) as any as S.Schema<GetContributorsStatsResponse>,
+  input: __S(48, __c3, 0) as any as S.Schema<GetContributorsStatsRequest>,
+  output: __S(53, __c3, 5) as any as S.Schema<GetContributorsStatsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8264,8 +8324,8 @@ export const getCustomDeploymentProtectionRule: API.OperationMethod<
   GetCustomDeploymentProtectionRuleError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(48, __c3, 0) as any as S.Schema<GetCustomDeploymentProtectionRuleRequest>,
-  output: __S(2464, __c154, 0) as any as S.Schema<DeploymentProtectionRule>,
+  input: __S(64, __c4, 0) as any as S.Schema<GetCustomDeploymentProtectionRuleRequest>,
+  output: __S(2432, __c152, 0) as any as S.Schema<DeploymentProtectionRule>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8281,8 +8341,8 @@ export const getDeployKey: API.OperationMethod<
   GetDeployKeyError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(64, __c4, 0) as any as S.Schema<GetDeployKeyRequest>,
-  output: __S(2352, __c147, 0) as any as S.Schema<DeployKey>,
+  input: __S(80, __c5, 0) as any as S.Schema<GetDeployKeyRequest>,
+  output: __S(2320, __c145, 0) as any as S.Schema<DeployKey>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8298,8 +8358,8 @@ export const getDeployment: API.OperationMethod<
   GetDeploymentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(80, __c5, 0) as any as S.Schema<GetDeploymentRequest>,
-  output: __S(2384, __c149, 0) as any as S.Schema<Deployment>,
+  input: __S(96, __c6, 0) as any as S.Schema<GetDeploymentRequest>,
+  output: __S(2352, __c147, 0) as any as S.Schema<Deployment>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8315,8 +8375,8 @@ export const getDeploymentBranchPolicy: API.OperationMethod<
   GetDeploymentBranchPolicyError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(96, __c6, 0) as any as S.Schema<GetDeploymentBranchPolicyRequest>,
-  output: __S(2432, __c152, 0) as any as S.Schema<DeploymentBranchPolicy>,
+  input: __S(112, __c7, 0) as any as S.Schema<GetDeploymentBranchPolicyRequest>,
+  output: __S(2400, __c150, 0) as any as S.Schema<DeploymentBranchPolicy>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8332,8 +8392,8 @@ export const getDeploymentStatus: API.OperationMethod<
   GetDeploymentStatusError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(112, __c7, 0) as any as S.Schema<GetDeploymentStatusRequest>,
-  output: __S(2512, __c157, 0) as any as S.Schema<DeploymentStatus>,
+  input: __S(128, __c8, 0) as any as S.Schema<GetDeploymentStatusRequest>,
+  output: __S(2480, __c155, 0) as any as S.Schema<DeploymentStatus>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8349,8 +8409,8 @@ export const getEnvironment: API.OperationMethod<
   GetEnvironmentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(128, __c8, 0) as any as S.Schema<GetEnvironmentRequest>,
-  output: __S(2722, __c170, 2) as any as S.Schema<Environment>,
+  input: __S(144, __c9, 0) as any as S.Schema<GetEnvironmentRequest>,
+  output: __S(2690, __c168, 2) as any as S.Schema<Environment>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8366,8 +8426,8 @@ export const getHashAlgorithm: API.OperationMethod<
   GetHashAlgorithmError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(144, __c9, 0) as any as S.Schema<GetHashAlgorithmRequest>,
-  output: __S(145, __c9, 1) as any as S.Schema<RepositoryHashAlgorithm>,
+  input: __S(160, __c10, 0) as any as S.Schema<GetHashAlgorithmRequest>,
+  output: __S(161, __c10, 1) as any as S.Schema<RepositoryHashAlgorithm>,
   errors: [Forbidden, NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8383,8 +8443,8 @@ export const getLatestPagesBuild: API.OperationMethod<
   GetLatestPagesBuildError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(160, __c10, 0) as any as S.Schema<GetLatestPagesBuildRequest>,
-  output: __S(177, __c11, 1) as any as S.Schema<PageBuild>,
+  input: __S(176, __c11, 0) as any as S.Schema<GetLatestPagesBuildRequest>,
+  output: __S(193, __c12, 1) as any as S.Schema<PageBuild>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8400,8 +8460,8 @@ export const getLatestRelease: API.OperationMethod<
   GetLatestReleaseError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(192, __c12, 0) as any as S.Schema<GetLatestReleaseRequest>,
-  output: __S(2864, __c179, 0) as any as S.Schema<Release>,
+  input: __S(208, __c13, 0) as any as S.Schema<GetLatestReleaseRequest>,
+  output: __S(2832, __c177, 0) as any as S.Schema<Release>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8417,8 +8477,8 @@ export const getOrgRuleset: API.OperationMethod<
   GetOrgRulesetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(208, __c13, 0) as any as S.Schema<GetOrgRulesetRequest>,
-  output: __S(2693, __c168, 5) as any as S.Schema<RepositoryRuleset>,
+  input: __S(240, __c15, 0) as any as S.Schema<GetOrgRulesetRequest>,
+  output: __S(2661, __c166, 5) as any as S.Schema<RepositoryRuleset>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8434,8 +8494,8 @@ export const getOrgRulesets: API.OperationMethod<
   GetOrgRulesetsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(240, __c15, 0) as any as S.Schema<GetOrgRulesetsRequest>,
-  output: __S(257, __c16, 1) as any as S.Schema<GetOrgRulesetsResponse>,
+  input: __S(256, __c16, 0) as any as S.Schema<GetOrgRulesetsRequest>,
+  output: __S(273, __c17, 1) as any as S.Schema<GetOrgRulesetsResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8451,8 +8511,8 @@ export const getOrgRuleSuite: API.OperationMethod<
   GetOrgRuleSuiteError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(272, __c17, 0) as any as S.Schema<GetOrgRuleSuiteRequest>,
-  output: __S(291, __c18, 3) as any as S.Schema<RuleSuite>,
+  input: __S(288, __c18, 0) as any as S.Schema<GetOrgRuleSuiteRequest>,
+  output: __S(307, __c19, 3) as any as S.Schema<RuleSuite>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8468,8 +8528,8 @@ export const getOrgRuleSuites: API.OperationMethod<
   GetOrgRuleSuitesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(304, __c19, 0) as any as S.Schema<GetOrgRuleSuitesRequest>,
-  output: __S(322, __c20, 2) as any as S.Schema<GetOrgRuleSuitesResponse>,
+  input: __S(320, __c20, 0) as any as S.Schema<GetOrgRuleSuitesRequest>,
+  output: __S(338, __c21, 2) as any as S.Schema<GetOrgRuleSuitesResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8481,8 +8541,8 @@ export type GetPagesError = NotFound | GithubOpError;
 /** Get a GitHub Pages site Gets information about a GitHub Pages site. OAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint. */
 export const getPages: API.OperationMethod<GetPagesRequest, Page, GetPagesError, GithubOpContext> =
   /*@__PURE__*/ API.make(() => ({
-    input: __S(336, __c21, 0) as any as S.Schema<GetPagesRequest>,
-    output: __S(2802, __c175, 2) as any as S.Schema<Page>,
+    input: __S(352, __c22, 0) as any as S.Schema<GetPagesRequest>,
+    output: __S(2770, __c173, 2) as any as S.Schema<Page>,
     errors: [NotFound],
     protocol: GithubProtocol,
     retry: Retry.Retry,
@@ -8498,8 +8558,8 @@ export const getPagesBuild: API.OperationMethod<
   GetPagesBuildError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(352, __c22, 0) as any as S.Schema<GetPagesBuildRequest>,
-  output: __S(177, __c11, 1) as any as S.Schema<PageBuild>,
+  input: __S(368, __c23, 0) as any as S.Schema<GetPagesBuildRequest>,
+  output: __S(193, __c12, 1) as any as S.Schema<PageBuild>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8515,8 +8575,8 @@ export const getPagesDeployment: API.OperationMethod<
   GetPagesDeploymentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(368, __c23, 0) as any as S.Schema<GetPagesDeploymentRequest>,
-  output: __S(3616, __c226, 0) as any as S.Schema<PagesDeploymentStatus>,
+  input: __S(384, __c24, 0) as any as S.Schema<GetPagesDeploymentRequest>,
+  output: __S(3584, __c224, 0) as any as S.Schema<PagesDeploymentStatus>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8532,8 +8592,8 @@ export const getPagesHealthCheck: API.OperationMethod<
   GetPagesHealthCheckError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(384, __c24, 0) as any as S.Schema<GetPagesHealthCheckRequest>,
-  output: __S(386, __c24, 2) as any as S.Schema<PagesHealthCheck>,
+  input: __S(400, __c25, 0) as any as S.Schema<GetPagesHealthCheckRequest>,
+  output: __S(402, __c25, 2) as any as S.Schema<PagesHealthCheck>,
   errors: [BadRequest, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8549,8 +8609,8 @@ export const getParticipationStats: API.OperationMethod<
   GetParticipationStatsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(400, __c25, 0) as any as S.Schema<GetParticipationStatsRequest>,
-  output: __S(401, __c25, 1) as any as S.Schema<ParticipationStats>,
+  input: __S(416, __c26, 0) as any as S.Schema<GetParticipationStatsRequest>,
+  output: __S(417, __c26, 1) as any as S.Schema<ParticipationStats>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8566,7 +8626,7 @@ export const getPullRequestReviewProtection: API.OperationMethod<
   GetPullRequestReviewProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(416, __c26, 0) as any as S.Schema<GetPullRequestReviewProtectionRequest>,
+  input: __S(432, __c27, 0) as any as S.Schema<GetPullRequestReviewProtectionRequest>,
   output: __S(4018, __c251, 2) as any as S.Schema<ProtectedBranchPullRequestReview>,
   errors: [],
   protocol: GithubProtocol,
@@ -8583,8 +8643,8 @@ export const getPunchCardStats: API.OperationMethod<
   GetPunchCardStatsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(432, __c27, 0) as any as S.Schema<GetPunchCardStatsRequest>,
-  output: __S(4209, __c263, 1) as any as S.Schema<GetPunchCardStatsResponse>,
+  input: __S(464, __c29, 0) as any as S.Schema<GetPunchCardStatsRequest>,
+  output: __S(4225, __c264, 1) as any as S.Schema<GetPunchCardStatsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8600,8 +8660,8 @@ export const getReadme: API.OperationMethod<
   GetReadmeError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(464, __c29, 0) as any as S.Schema<GetReadmeRequest>,
-  output: __S(481, __c30, 1) as any as S.Schema<ContentFile>,
+  input: __S(480, __c30, 0) as any as S.Schema<GetReadmeRequest>,
+  output: __S(497, __c31, 1) as any as S.Schema<ContentFile>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8617,8 +8677,8 @@ export const getReadmeInDirectory: API.OperationMethod<
   GetReadmeInDirectoryError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(496, __c31, 0) as any as S.Schema<GetReadmeInDirectoryRequest>,
-  output: __S(481, __c30, 1) as any as S.Schema<ContentFile>,
+  input: __S(512, __c32, 0) as any as S.Schema<GetReadmeInDirectoryRequest>,
+  output: __S(497, __c31, 1) as any as S.Schema<ContentFile>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8634,8 +8694,8 @@ export const getRelease: API.OperationMethod<
   GetReleaseError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(512, __c32, 0) as any as S.Schema<GetReleaseRequest>,
-  output: __S(2864, __c179, 0) as any as S.Schema<Release>,
+  input: __S(528, __c33, 0) as any as S.Schema<GetReleaseRequest>,
+  output: __S(2832, __c177, 0) as any as S.Schema<Release>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8651,8 +8711,8 @@ export const getReleaseAsset: API.OperationMethod<
   GetReleaseAssetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(528, __c33, 0) as any as S.Schema<GetReleaseAssetRequest>,
-  output: __S(2832, __c177, 0) as any as S.Schema<ReleaseAsset>,
+  input: __S(544, __c34, 0) as any as S.Schema<GetReleaseAssetRequest>,
+  output: __S(2800, __c175, 0) as any as S.Schema<ReleaseAsset>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8668,8 +8728,8 @@ export const getReleaseByTag: API.OperationMethod<
   GetReleaseByTagError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(544, __c34, 0) as any as S.Schema<GetReleaseByTagRequest>,
-  output: __S(2864, __c179, 0) as any as S.Schema<Release>,
+  input: __S(560, __c35, 0) as any as S.Schema<GetReleaseByTagRequest>,
+  output: __S(2832, __c177, 0) as any as S.Schema<Release>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8685,8 +8745,8 @@ export const getRepoRuleset: API.OperationMethod<
   GetRepoRulesetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(560, __c35, 0) as any as S.Schema<GetRepoRulesetRequest>,
-  output: __S(2693, __c168, 5) as any as S.Schema<RepositoryRuleset>,
+  input: __S(576, __c36, 0) as any as S.Schema<GetRepoRulesetRequest>,
+  output: __S(2661, __c166, 5) as any as S.Schema<RepositoryRuleset>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8702,8 +8762,8 @@ export const getRepoRulesetHistory: API.OperationMethod<
   GetRepoRulesetHistoryError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(576, __c36, 0) as any as S.Schema<GetRepoRulesetHistoryRequest>,
-  output: __S(579, __c36, 3) as any as S.Schema<GetRepoRulesetHistoryResponse>,
+  input: __S(592, __c37, 0) as any as S.Schema<GetRepoRulesetHistoryRequest>,
+  output: __S(595, __c37, 3) as any as S.Schema<GetRepoRulesetHistoryResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8719,8 +8779,8 @@ export const getRepoRulesets: API.OperationMethod<
   GetRepoRulesetsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(608, __c38, 0) as any as S.Schema<GetRepoRulesetsRequest>,
-  output: __S(257, __c16, 1) as any as S.Schema<GetRepoRulesetsResponse>,
+  input: __S(624, __c39, 0) as any as S.Schema<GetRepoRulesetsRequest>,
+  output: __S(273, __c17, 1) as any as S.Schema<GetRepoRulesetsResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8736,8 +8796,8 @@ export const getRepoRulesetVersion: API.OperationMethod<
   GetRepoRulesetVersionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(624, __c39, 0) as any as S.Schema<GetRepoRulesetVersionRequest>,
-  output: __S(625, __c39, 1) as any as S.Schema<GetRepoRulesetVersionResponse>,
+  input: __S(640, __c40, 0) as any as S.Schema<GetRepoRulesetVersionRequest>,
+  output: __S(641, __c40, 1) as any as S.Schema<GetRepoRulesetVersionResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8753,8 +8813,8 @@ export const getRepoRuleSuite: API.OperationMethod<
   GetRepoRuleSuiteError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(640, __c40, 0) as any as S.Schema<GetRepoRuleSuiteRequest>,
-  output: __S(291, __c18, 3) as any as S.Schema<RuleSuite>,
+  input: __S(672, __c42, 0) as any as S.Schema<GetRepoRuleSuiteRequest>,
+  output: __S(307, __c19, 3) as any as S.Schema<RuleSuite>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8770,8 +8830,8 @@ export const getRepoRuleSuites: API.OperationMethod<
   GetRepoRuleSuitesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(672, __c42, 0) as any as S.Schema<GetRepoRuleSuitesRequest>,
-  output: __S(322, __c20, 2) as any as S.Schema<GetRepoRuleSuitesResponse>,
+  input: __S(688, __c43, 0) as any as S.Schema<GetRepoRuleSuitesRequest>,
+  output: __S(338, __c21, 2) as any as S.Schema<GetRepoRuleSuitesResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8787,8 +8847,8 @@ export const getStatusChecksProtection: API.OperationMethod<
   GetStatusChecksProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(688, __c43, 0) as any as S.Schema<GetStatusChecksProtectionRequest>,
-  output: __S(704, __c44, 0) as any as S.Schema<StatusCheckPolicy>,
+  input: __S(704, __c44, 0) as any as S.Schema<GetStatusChecksProtectionRequest>,
+  output: __S(720, __c45, 0) as any as S.Schema<StatusCheckPolicy>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8804,8 +8864,8 @@ export const getTeamsWithAccessToProtectedBranch: API.OperationMethod<
   GetTeamsWithAccessToProtectedBranchError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(720, __c45, 0) as any as S.Schema<GetTeamsWithAccessToProtectedBranchRequest>,
-  output: __S(4160, __c260, 0) as any as S.Schema<GetTeamsWithAccessToProtectedBranchResponse>,
+  input: __S(736, __c46, 0) as any as S.Schema<GetTeamsWithAccessToProtectedBranchRequest>,
+  output: __S(4144, __c259, 0) as any as S.Schema<GetTeamsWithAccessToProtectedBranchResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8821,8 +8881,8 @@ export const getTopPaths: API.OperationMethod<
   GetTopPathsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(736, __c46, 0) as any as S.Schema<GetTopPathsRequest>,
-  output: __S(739, __c46, 3) as any as S.Schema<GetTopPathsResponse>,
+  input: __S(752, __c47, 0) as any as S.Schema<GetTopPathsRequest>,
+  output: __S(755, __c47, 3) as any as S.Schema<GetTopPathsResponse>,
   errors: [Forbidden],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8838,8 +8898,8 @@ export const getTopReferrers: API.OperationMethod<
   GetTopReferrersError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(752, __c47, 0) as any as S.Schema<GetTopReferrersRequest>,
-  output: __S(755, __c47, 3) as any as S.Schema<GetTopReferrersResponse>,
+  input: __S(768, __c48, 0) as any as S.Schema<GetTopReferrersRequest>,
+  output: __S(771, __c48, 3) as any as S.Schema<GetTopReferrersResponse>,
   errors: [Forbidden],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8855,7 +8915,7 @@ export const getUsersWithAccessToProtectedBranch: API.OperationMethod<
   GetUsersWithAccessToProtectedBranchError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(768, __c48, 0) as any as S.Schema<GetUsersWithAccessToProtectedBranchRequest>,
+  input: __S(784, __c49, 0) as any as S.Schema<GetUsersWithAccessToProtectedBranchRequest>,
   output: __S(16, __c1, 0) as any as S.Schema<GetUsersWithAccessToProtectedBranchResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
@@ -8872,8 +8932,8 @@ export const getViews: API.OperationMethod<
   GetViewsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(784, __c49, 0) as any as S.Schema<GetViewsRequest>,
-  output: __S(785, __c49, 1) as any as S.Schema<ViewTraffic>,
+  input: __S(800, __c50, 0) as any as S.Schema<GetViewsRequest>,
+  output: __S(801, __c50, 1) as any as S.Schema<ViewTraffic>,
   errors: [Forbidden],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8889,8 +8949,8 @@ export const getWebhook: API.OperationMethod<
   GetWebhookError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(800, __c50, 0) as any as S.Schema<GetWebhookRequest>,
-  output: __S(2961, __c185, 1) as any as S.Schema<Hook>,
+  input: __S(816, __c51, 0) as any as S.Schema<GetWebhookRequest>,
+  output: __S(2929, __c183, 1) as any as S.Schema<Hook>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8906,8 +8966,8 @@ export const getWebhookConfigForRepo: API.OperationMethod<
   GetWebhookConfigForRepoError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(816, __c51, 0) as any as S.Schema<GetWebhookConfigForRepoRequest>,
-  output: __S(2944, __c184, 0) as any as S.Schema<WebhookConfig>,
+  input: __S(832, __c52, 0) as any as S.Schema<GetWebhookConfigForRepoRequest>,
+  output: __S(2912, __c182, 0) as any as S.Schema<WebhookConfig>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8923,8 +8983,8 @@ export const getWebhookDelivery: API.OperationMethod<
   GetWebhookDeliveryError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(832, __c52, 0) as any as S.Schema<GetWebhookDeliveryRequest>,
-  output: __S(834, __c52, 2) as any as S.Schema<HookDelivery>,
+  input: __S(864, __c54, 0) as any as S.Schema<GetWebhookDeliveryRequest>,
+  output: __S(866, __c54, 2) as any as S.Schema<HookDelivery>,
   errors: [BadRequest, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8940,8 +9000,8 @@ export const listActivities: API.OperationMethod<
   ListActivitiesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(864, __c54, 0) as any as S.Schema<ListActivitiesRequest>,
-  output: __S(867, __c54, 3) as any as S.Schema<ListActivitiesResponse>,
+  input: __S(880, __c55, 0) as any as S.Schema<ListActivitiesRequest>,
+  output: __S(883, __c55, 3) as any as S.Schema<ListActivitiesResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8957,8 +9017,8 @@ export const listAttestations: API.OperationMethod<
   ListAttestationsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(880, __c55, 0) as any as S.Schema<ListAttestationsRequest>,
-  output: __S(883, __c55, 3) as any as S.Schema<ListAttestationsResponse>,
+  input: __S(896, __c56, 0) as any as S.Schema<ListAttestationsRequest>,
+  output: __S(899, __c56, 3) as any as S.Schema<ListAttestationsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8974,8 +9034,8 @@ export const listAutolinks: API.OperationMethod<
   ListAutolinksError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(896, __c56, 0) as any as S.Schema<ListAutolinksRequest>,
-  output: __S(898, __c56, 2) as any as S.Schema<ListAutolinksResponse>,
+  input: __S(912, __c57, 0) as any as S.Schema<ListAutolinksRequest>,
+  output: __S(914, __c57, 2) as any as S.Schema<ListAutolinksResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -8991,8 +9051,8 @@ export const listBranches: API.OperationMethod<
   ListBranchesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(912, __c57, 0) as any as S.Schema<ListBranchesRequest>,
-  output: __S(915, __c57, 3) as any as S.Schema<ListBranchesResponse>,
+  input: __S(928, __c58, 0) as any as S.Schema<ListBranchesRequest>,
+  output: __S(931, __c58, 3) as any as S.Schema<ListBranchesResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9008,8 +9068,8 @@ export const listBranchesForHeadCommit: API.OperationMethod<
   ListBranchesForHeadCommitError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(928, __c58, 0) as any as S.Schema<ListBranchesForHeadCommitRequest>,
-  output: __S(931, __c58, 3) as any as S.Schema<ListBranchesForHeadCommitResponse>,
+  input: __S(944, __c59, 0) as any as S.Schema<ListBranchesForHeadCommitRequest>,
+  output: __S(947, __c59, 3) as any as S.Schema<ListBranchesForHeadCommitResponse>,
   errors: [Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9025,8 +9085,8 @@ export const listCollaborators: API.OperationMethod<
   ListCollaboratorsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(944, __c59, 0) as any as S.Schema<ListCollaboratorsRequest>,
-  output: __S(946, __c59, 2) as any as S.Schema<ListCollaboratorsResponse>,
+  input: __S(960, __c60, 0) as any as S.Schema<ListCollaboratorsRequest>,
+  output: __S(962, __c60, 2) as any as S.Schema<ListCollaboratorsResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9042,8 +9102,8 @@ export const listCommentsForCommit: API.OperationMethod<
   ListCommentsForCommitError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(960, __c60, 0) as any as S.Schema<ListCommentsForCommitRequest>,
-  output: __S(977, __c61, 1) as any as S.Schema<ListCommentsForCommitResponse>,
+  input: __S(976, __c61, 0) as any as S.Schema<ListCommentsForCommitRequest>,
+  output: __S(993, __c62, 1) as any as S.Schema<ListCommentsForCommitResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9059,8 +9119,8 @@ export const listCommitCommentsForRepo: API.OperationMethod<
   ListCommitCommentsForRepoError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(992, __c62, 0) as any as S.Schema<ListCommitCommentsForRepoRequest>,
-  output: __S(977, __c61, 1) as any as S.Schema<ListCommitCommentsForRepoResponse>,
+  input: __S(1008, __c63, 0) as any as S.Schema<ListCommitCommentsForRepoRequest>,
+  output: __S(993, __c62, 1) as any as S.Schema<ListCommitCommentsForRepoResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9081,8 +9141,8 @@ export const listCommits: API.OperationMethod<
   ListCommitsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1008, __c63, 0) as any as S.Schema<ListCommitsRequest>,
-  output: __S(1009, __c63, 1) as any as S.Schema<ListCommitsResponse>,
+  input: __S(1025, __c64, 1) as any as S.Schema<ListCommitsRequest>,
+  output: __S(1026, __c64, 2) as any as S.Schema<ListCommitsResponse>,
   errors: [BadRequest, NotFound, Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9098,8 +9158,8 @@ export const listCommitStatusesForRef: API.OperationMethod<
   ListCommitStatusesForRefError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1024, __c64, 0) as any as S.Schema<ListCommitStatusesForRefRequest>,
-  output: __S(1026, __c64, 2) as any as S.Schema<ListCommitStatusesForRefResponse>,
+  input: __S(1072, __c67, 0) as any as S.Schema<ListCommitStatusesForRefRequest>,
+  output: __S(1074, __c67, 2) as any as S.Schema<ListCommitStatusesForRefResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9115,8 +9175,8 @@ export const listContributors: API.OperationMethod<
   ListContributorsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1072, __c67, 0) as any as S.Schema<ListContributorsRequest>,
-  output: __S(1075, __c67, 3) as any as S.Schema<ListContributorsResponse>,
+  input: __S(1088, __c68, 0) as any as S.Schema<ListContributorsRequest>,
+  output: __S(1091, __c68, 3) as any as S.Schema<ListContributorsResponse>,
   errors: [Forbidden, NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9132,8 +9192,8 @@ export const listCustomDeploymentRuleIntegrations: API.OperationMethod<
   ListCustomDeploymentRuleIntegrationsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1088, __c68, 0) as any as S.Schema<ListCustomDeploymentRuleIntegrationsRequest>,
-  output: __S(1090, __c68, 2) as any as S.Schema<ListCustomDeploymentRuleIntegrationsResponse>,
+  input: __S(1104, __c69, 0) as any as S.Schema<ListCustomDeploymentRuleIntegrationsRequest>,
+  output: __S(1106, __c69, 2) as any as S.Schema<ListCustomDeploymentRuleIntegrationsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9149,8 +9209,8 @@ export const listDeployKeys: API.OperationMethod<
   ListDeployKeysError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1104, __c69, 0) as any as S.Schema<ListDeployKeysRequest>,
-  output: __S(1106, __c69, 2) as any as S.Schema<ListDeployKeysResponse>,
+  input: __S(1120, __c70, 0) as any as S.Schema<ListDeployKeysRequest>,
+  output: __S(1122, __c70, 2) as any as S.Schema<ListDeployKeysResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9166,8 +9226,8 @@ export const listDeploymentBranchPolicies: API.OperationMethod<
   ListDeploymentBranchPoliciesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1120, __c70, 0) as any as S.Schema<ListDeploymentBranchPoliciesRequest>,
-  output: __S(1122, __c70, 2) as any as S.Schema<ListDeploymentBranchPoliciesResponse>,
+  input: __S(1136, __c71, 0) as any as S.Schema<ListDeploymentBranchPoliciesRequest>,
+  output: __S(1138, __c71, 2) as any as S.Schema<ListDeploymentBranchPoliciesResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9183,8 +9243,8 @@ export const listDeployments: API.OperationMethod<
   ListDeploymentsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1136, __c71, 0) as any as S.Schema<ListDeploymentsRequest>,
-  output: __S(1138, __c71, 2) as any as S.Schema<ListDeploymentsResponse>,
+  input: __S(1152, __c72, 0) as any as S.Schema<ListDeploymentsRequest>,
+  output: __S(1154, __c72, 2) as any as S.Schema<ListDeploymentsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9200,8 +9260,8 @@ export const listDeploymentStatuses: API.OperationMethod<
   ListDeploymentStatusesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1152, __c72, 0) as any as S.Schema<ListDeploymentStatusesRequest>,
-  output: __S(1154, __c72, 2) as any as S.Schema<ListDeploymentStatusesResponse>,
+  input: __S(1168, __c73, 0) as any as S.Schema<ListDeploymentStatusesRequest>,
+  output: __S(1170, __c73, 2) as any as S.Schema<ListDeploymentStatusesResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9217,8 +9277,8 @@ export const listForAuthenticatedUser: API.OperationMethod<
   ListForAuthenticatedUserError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1168, __c73, 0) as any as S.Schema<ListForAuthenticatedUserRequest>,
-  output: __S(1170, __c73, 2) as any as S.Schema<ListForAuthenticatedUserResponse>,
+  input: __S(1184, __c74, 0) as any as S.Schema<ListForAuthenticatedUserRequest>,
+  output: __S(1186, __c74, 2) as any as S.Schema<ListForAuthenticatedUserResponse>,
   errors: [Forbidden, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9234,8 +9294,8 @@ export const listForks: API.OperationMethod<
   ListForksError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1184, __c74, 0) as any as S.Schema<ListForksRequest>,
-  output: __S(1201, __c75, 1) as any as S.Schema<ListForksResponse>,
+  input: __S(1200, __c75, 0) as any as S.Schema<ListForksRequest>,
+  output: __S(1217, __c76, 1) as any as S.Schema<ListForksResponse>,
   errors: [BadRequest],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9251,8 +9311,8 @@ export const listForOrg: API.OperationMethod<
   ListForOrgError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1216, __c76, 0) as any as S.Schema<ListForOrgRequest>,
-  output: __S(1201, __c75, 1) as any as S.Schema<ListForOrgResponse>,
+  input: __S(1232, __c77, 0) as any as S.Schema<ListForOrgRequest>,
+  output: __S(1217, __c76, 1) as any as S.Schema<ListForOrgResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9268,8 +9328,8 @@ export const listForUser: API.OperationMethod<
   ListForUserError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1232, __c77, 0) as any as S.Schema<ListForUserRequest>,
-  output: __S(1201, __c75, 1) as any as S.Schema<ListForUserResponse>,
+  input: __S(1264, __c79, 0) as any as S.Schema<ListForUserRequest>,
+  output: __S(1217, __c76, 1) as any as S.Schema<ListForUserResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9285,8 +9345,8 @@ export const listInvitations: API.OperationMethod<
   ListInvitationsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1264, __c79, 0) as any as S.Schema<ListInvitationsRequest>,
-  output: __S(1281, __c80, 1) as any as S.Schema<ListInvitationsResponse>,
+  input: __S(1280, __c80, 0) as any as S.Schema<ListInvitationsRequest>,
+  output: __S(1297, __c81, 1) as any as S.Schema<ListInvitationsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9302,8 +9362,8 @@ export const listInvitationsForAuthenticatedUser: API.OperationMethod<
   ListInvitationsForAuthenticatedUserError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1296, __c81, 0) as any as S.Schema<ListInvitationsForAuthenticatedUserRequest>,
-  output: __S(1281, __c80, 1) as any as S.Schema<ListInvitationsForAuthenticatedUserResponse>,
+  input: __S(1312, __c82, 0) as any as S.Schema<ListInvitationsForAuthenticatedUserRequest>,
+  output: __S(1297, __c81, 1) as any as S.Schema<ListInvitationsForAuthenticatedUserResponse>,
   errors: [Forbidden, NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9319,8 +9379,8 @@ export const listIssueTypes: API.OperationMethod<
   ListIssueTypesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1312, __c82, 0) as any as S.Schema<ListIssueTypesRequest>,
-  output: __S(1315, __c82, 3) as any as S.Schema<ListIssueTypesResponse>,
+  input: __S(1328, __c83, 0) as any as S.Schema<ListIssueTypesRequest>,
+  output: __S(1331, __c83, 3) as any as S.Schema<ListIssueTypesResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9336,8 +9396,8 @@ export const listLanguages: API.OperationMethod<
   ListLanguagesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1328, __c83, 0) as any as S.Schema<ListLanguagesRequest>,
-  output: __S(1330, __c83, 2) as any as S.Schema<ListLanguagesResponse>,
+  input: __S(1344, __c84, 0) as any as S.Schema<ListLanguagesRequest>,
+  output: __S(1346, __c84, 2) as any as S.Schema<ListLanguagesResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9353,8 +9413,8 @@ export const listPagesBuilds: API.OperationMethod<
   ListPagesBuildsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1344, __c84, 0) as any as S.Schema<ListPagesBuildsRequest>,
-  output: __S(1346, __c84, 2) as any as S.Schema<ListPagesBuildsResponse>,
+  input: __S(1360, __c85, 0) as any as S.Schema<ListPagesBuildsRequest>,
+  output: __S(1362, __c85, 2) as any as S.Schema<ListPagesBuildsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9370,8 +9430,8 @@ export const listPublic: API.OperationMethod<
   ListPublicError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1360, __c85, 0) as any as S.Schema<ListPublicRequest>,
-  output: __S(1201, __c75, 1) as any as S.Schema<ListPublicResponse>,
+  input: __S(1376, __c86, 0) as any as S.Schema<ListPublicRequest>,
+  output: __S(1217, __c76, 1) as any as S.Schema<ListPublicResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9387,8 +9447,8 @@ export const listPullRequestsAssociatedWithCommit: API.OperationMethod<
   ListPullRequestsAssociatedWithCommitError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1376, __c86, 0) as any as S.Schema<ListPullRequestsAssociatedWithCommitRequest>,
-  output: __S(1388, __c86, 12) as any as S.Schema<ListPullRequestsAssociatedWithCommitResponse>,
+  input: __S(1392, __c87, 0) as any as S.Schema<ListPullRequestsAssociatedWithCommitRequest>,
+  output: __S(1404, __c87, 12) as any as S.Schema<ListPullRequestsAssociatedWithCommitResponse>,
   errors: [Conflict],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9404,8 +9464,8 @@ export const listReleaseAssets: API.OperationMethod<
   ListReleaseAssetsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1392, __c87, 0) as any as S.Schema<ListReleaseAssetsRequest>,
-  output: __S(1393, __c87, 1) as any as S.Schema<ListReleaseAssetsResponse>,
+  input: __S(1408, __c88, 0) as any as S.Schema<ListReleaseAssetsRequest>,
+  output: __S(1409, __c88, 1) as any as S.Schema<ListReleaseAssetsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9421,8 +9481,8 @@ export const listReleases: API.OperationMethod<
   ListReleasesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1408, __c88, 0) as any as S.Schema<ListReleasesRequest>,
-  output: __S(1410, __c88, 2) as any as S.Schema<ListReleasesResponse>,
+  input: __S(1424, __c89, 0) as any as S.Schema<ListReleasesRequest>,
+  output: __S(1426, __c89, 2) as any as S.Schema<ListReleasesResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9438,8 +9498,8 @@ export const listTags: API.OperationMethod<
   ListTagsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1424, __c89, 0) as any as S.Schema<ListTagsRequest>,
-  output: __S(1427, __c89, 3) as any as S.Schema<ListTagsResponse>,
+  input: __S(1456, __c91, 0) as any as S.Schema<ListTagsRequest>,
+  output: __S(1459, __c91, 3) as any as S.Schema<ListTagsResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9455,8 +9515,8 @@ export const listTeams: API.OperationMethod<
   ListTeamsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1456, __c91, 0) as any as S.Schema<ListTeamsRequest>,
-  output: __S(4160, __c260, 0) as any as S.Schema<ListTeamsResponse>,
+  input: __S(1472, __c92, 0) as any as S.Schema<ListTeamsRequest>,
+  output: __S(4144, __c259, 0) as any as S.Schema<ListTeamsResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9472,8 +9532,8 @@ export const listWebhookDeliveries: API.OperationMethod<
   ListWebhookDeliveriesError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1472, __c92, 0) as any as S.Schema<ListWebhookDeliveriesRequest>,
-  output: __S(1475, __c92, 3) as any as S.Schema<ListWebhookDeliveriesResponse>,
+  input: __S(1488, __c93, 0) as any as S.Schema<ListWebhookDeliveriesRequest>,
+  output: __S(1491, __c93, 3) as any as S.Schema<ListWebhookDeliveriesResponse>,
   errors: [BadRequest, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9489,8 +9549,8 @@ export const listWebhooks: API.OperationMethod<
   ListWebhooksError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1488, __c93, 0) as any as S.Schema<ListWebhooksRequest>,
-  output: __S(1490, __c93, 2) as any as S.Schema<ListWebhooksResponse>,
+  input: __S(1504, __c94, 0) as any as S.Schema<ListWebhooksRequest>,
+  output: __S(1506, __c94, 2) as any as S.Schema<ListWebhooksResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9502,8 +9562,8 @@ export type MergeError = Forbidden | NotFound | Conflict | UnprocessableEntity |
 /** Merge a branch */
 export const merge: API.OperationMethod<MergeRequest, Commit, MergeError, GithubOpContext> =
   /*@__PURE__*/ API.make(() => ({
-    input: __S(1504, __c94, 0) as any as S.Schema<MergeRequest>,
-    output: __S(1672, __c104, 8) as any as S.Schema<Commit>,
+    input: __S(1520, __c95, 0) as any as S.Schema<MergeRequest>,
+    output: __S(3992, __c249, 8) as any as S.Schema<Commit>,
     errors: [Forbidden, NotFound, Conflict, UnprocessableEntity],
     protocol: GithubProtocol,
     retry: Retry.Retry,
@@ -9519,8 +9579,8 @@ export const mergeUpstream: API.OperationMethod<
   MergeUpstreamError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1520, __c95, 0) as any as S.Schema<MergeUpstreamRequest>,
-  output: __S(1521, __c95, 1) as any as S.Schema<MergedUpstream>,
+  input: __S(1536, __c96, 0) as any as S.Schema<MergeUpstreamRequest>,
+  output: __S(1537, __c96, 1) as any as S.Schema<MergedUpstream>,
   errors: [Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9536,8 +9596,8 @@ export const pingWebhook: API.OperationMethod<
   PingWebhookError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1536, __c96, 0) as any as S.Schema<PingWebhookRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<PingWebhookResponse>,
+  input: __S(1552, __c97, 0) as any as S.Schema<PingWebhookRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<PingWebhookResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9553,8 +9613,8 @@ export const redeliverWebhookDelivery: API.OperationMethod<
   RedeliverWebhookDeliveryError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1552, __c97, 0) as any as S.Schema<RedeliverWebhookDeliveryRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<RedeliverWebhookDeliveryResponse>,
+  input: __S(1568, __c98, 0) as any as S.Schema<RedeliverWebhookDeliveryRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<RedeliverWebhookDeliveryResponse>,
   errors: [BadRequest, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9570,8 +9630,8 @@ export const removeAppAccessRestrictions: API.OperationMethod<
   RemoveAppAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1568, __c98, 0) as any as S.Schema<RemoveAppAccessRestrictionsRequest>,
-  output: __S(3360, __c210, 0) as any as S.Schema<RemoveAppAccessRestrictionsResponse>,
+  input: __S(1584, __c99, 0) as any as S.Schema<RemoveAppAccessRestrictionsRequest>,
+  output: __S(3328, __c208, 0) as any as S.Schema<RemoveAppAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9587,8 +9647,8 @@ export const removeCollaborator: API.OperationMethod<
   RemoveCollaboratorError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1584, __c99, 0) as any as S.Schema<RemoveCollaboratorRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<RemoveCollaboratorResponse>,
+  input: __S(1600, __c100, 0) as any as S.Schema<RemoveCollaboratorRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<RemoveCollaboratorResponse>,
   errors: [Forbidden, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9604,8 +9664,8 @@ export const removeStatusCheckContexts: API.OperationMethod<
   RemoveStatusCheckContextsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1600, __c100, 0) as any as S.Schema<RemoveStatusCheckContextsRequest>,
-  output: __S(3856, __c241, 0) as any as S.Schema<RemoveStatusCheckContextsResponse>,
+  input: __S(1632, __c102, 0) as any as S.Schema<RemoveStatusCheckContextsRequest>,
+  output: __S(3824, __c239, 0) as any as S.Schema<RemoveStatusCheckContextsResponse>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9621,8 +9681,8 @@ export const removeStatusCheckProtection: API.OperationMethod<
   RemoveStatusCheckProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1680, __c105, 0) as any as S.Schema<RemoveStatusCheckProtectionRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<RemoveStatusCheckProtectionResponse>,
+  input: __S(1648, __c103, 0) as any as S.Schema<RemoveStatusCheckProtectionRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<RemoveStatusCheckProtectionResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9638,8 +9698,8 @@ export const removeTeamAccessRestrictions: API.OperationMethod<
   RemoveTeamAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1696, __c106, 0) as any as S.Schema<RemoveTeamAccessRestrictionsRequest>,
-  output: __S(4160, __c260, 0) as any as S.Schema<RemoveTeamAccessRestrictionsResponse>,
+  input: __S(1664, __c104, 0) as any as S.Schema<RemoveTeamAccessRestrictionsRequest>,
+  output: __S(4144, __c259, 0) as any as S.Schema<RemoveTeamAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9655,7 +9715,7 @@ export const removeUserAccessRestrictions: API.OperationMethod<
   RemoveUserAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1712, __c107, 0) as any as S.Schema<RemoveUserAccessRestrictionsRequest>,
+  input: __S(1680, __c105, 0) as any as S.Schema<RemoveUserAccessRestrictionsRequest>,
   output: __S(16, __c1, 0) as any as S.Schema<RemoveUserAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
@@ -9672,7 +9732,7 @@ export const renameBranch: API.OperationMethod<
   RenameBranchError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1728, __c108, 0) as any as S.Schema<RenameBranchRequest>,
+  input: __S(1696, __c106, 0) as any as S.Schema<RenameBranchRequest>,
   output: __S(4001, __c250, 1) as any as S.Schema<BranchWithProtection>,
   errors: [Forbidden, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
@@ -9689,8 +9749,8 @@ export const replaceAllTopics: API.OperationMethod<
   ReplaceAllTopicsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1744, __c109, 0) as any as S.Schema<ReplaceAllTopicsRequest>,
-  output: __S(3936, __c246, 0) as any as S.Schema<Topic>,
+  input: __S(1712, __c107, 0) as any as S.Schema<ReplaceAllTopicsRequest>,
+  output: __S(3904, __c244, 0) as any as S.Schema<Topic>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9706,8 +9766,8 @@ export const requestPagesBuild: API.OperationMethod<
   RequestPagesBuildError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1760, __c110, 0) as any as S.Schema<RequestPagesBuildRequest>,
-  output: __S(1761, __c110, 1) as any as S.Schema<PageBuildStatus>,
+  input: __S(1728, __c108, 0) as any as S.Schema<RequestPagesBuildRequest>,
+  output: __S(1729, __c108, 1) as any as S.Schema<PageBuildStatus>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9723,8 +9783,8 @@ export const setAdminBranchProtection: API.OperationMethod<
   SetAdminBranchProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1776, __c111, 0) as any as S.Schema<SetAdminBranchProtectionRequest>,
-  output: __S(2288, __c143, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
+  input: __S(1744, __c109, 0) as any as S.Schema<SetAdminBranchProtectionRequest>,
+  output: __S(2256, __c141, 0) as any as S.Schema<ProtectedBranchAdminEnforced>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9740,8 +9800,8 @@ export const setAppAccessRestrictions: API.OperationMethod<
   SetAppAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1792, __c112, 0) as any as S.Schema<SetAppAccessRestrictionsRequest>,
-  output: __S(3360, __c210, 0) as any as S.Schema<SetAppAccessRestrictionsResponse>,
+  input: __S(1760, __c110, 0) as any as S.Schema<SetAppAccessRestrictionsRequest>,
+  output: __S(3328, __c208, 0) as any as S.Schema<SetAppAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9757,8 +9817,8 @@ export const setStatusCheckContexts: API.OperationMethod<
   SetStatusCheckContextsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1808, __c113, 0) as any as S.Schema<SetStatusCheckContextsRequest>,
-  output: __S(3856, __c241, 0) as any as S.Schema<SetStatusCheckContextsResponse>,
+  input: __S(1776, __c111, 0) as any as S.Schema<SetStatusCheckContextsRequest>,
+  output: __S(3824, __c239, 0) as any as S.Schema<SetStatusCheckContextsResponse>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9775,7 +9835,7 @@ export const setTeamAccessRestrictions: API.OperationMethod<
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
   input: __S(1824, __c114, 0) as any as S.Schema<SetTeamAccessRestrictionsRequest>,
-  output: __S(4160, __c260, 0) as any as S.Schema<SetTeamAccessRestrictionsResponse>,
+  output: __S(4144, __c259, 0) as any as S.Schema<SetTeamAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9791,7 +9851,7 @@ export const setUserAccessRestrictions: API.OperationMethod<
   SetUserAccessRestrictionsError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1872, __c117, 0) as any as S.Schema<SetUserAccessRestrictionsRequest>,
+  input: __S(1840, __c115, 0) as any as S.Schema<SetUserAccessRestrictionsRequest>,
   output: __S(16, __c1, 0) as any as S.Schema<SetUserAccessRestrictionsResponse>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
@@ -9808,8 +9868,8 @@ export const testPushWebhook: API.OperationMethod<
   TestPushWebhookError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1888, __c118, 0) as any as S.Schema<TestPushWebhookRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<TestPushWebhookResponse>,
+  input: __S(1856, __c116, 0) as any as S.Schema<TestPushWebhookRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<TestPushWebhookResponse>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9825,8 +9885,8 @@ export const transfer: API.OperationMethod<
   TransferError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1904, __c119, 0) as any as S.Schema<TransferRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<TransferResponse>,
+  input: __S(1872, __c117, 0) as any as S.Schema<TransferRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<TransferResponse>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9842,8 +9902,8 @@ export const update: API.OperationMethod<
   UpdateError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1922, __c120, 2) as any as S.Schema<UpdateRequest>,
-  output: __S(2577, __c161, 1) as any as S.Schema<FullRepository>,
+  input: __S(1890, __c118, 2) as any as S.Schema<UpdateRequest>,
+  output: __S(2545, __c159, 1) as any as S.Schema<FullRepository>,
   errors: [Forbidden, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9863,8 +9923,8 @@ export const updateBranchProtection: API.OperationMethod<
   UpdateBranchProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1939, __c121, 3) as any as S.Schema<UpdateBranchProtectionRequest>,
-  output: __S(1943, __c121, 7) as any as S.Schema<ProtectedBranch>,
+  input: __S(1907, __c119, 3) as any as S.Schema<UpdateBranchProtectionRequest>,
+  output: __S(1911, __c119, 7) as any as S.Schema<ProtectedBranch>,
   errors: [Forbidden, NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9880,8 +9940,8 @@ export const updateCommitComment: API.OperationMethod<
   UpdateCommitCommentError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(1984, __c124, 0) as any as S.Schema<UpdateCommitCommentRequest>,
-  output: __S(2256, __c141, 0) as any as S.Schema<CommitComment>,
+  input: __S(1952, __c122, 0) as any as S.Schema<UpdateCommitCommentRequest>,
+  output: __S(2224, __c139, 0) as any as S.Schema<CommitComment>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9897,8 +9957,8 @@ export const updateDeploymentBranchPolicy: API.OperationMethod<
   UpdateDeploymentBranchPolicyError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2000, __c125, 0) as any as S.Schema<UpdateDeploymentBranchPolicyRequest>,
-  output: __S(2432, __c152, 0) as any as S.Schema<DeploymentBranchPolicy>,
+  input: __S(1968, __c123, 0) as any as S.Schema<UpdateDeploymentBranchPolicyRequest>,
+  output: __S(2400, __c150, 0) as any as S.Schema<DeploymentBranchPolicy>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9918,8 +9978,8 @@ export const updateInformationAboutPagesSite: API.OperationMethod<
   UpdateInformationAboutPagesSiteError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2016, __c126, 0) as any as S.Schema<UpdateInformationAboutPagesSiteRequest>,
-  output: __S(3136, __c196, 0) as any as S.Schema<UpdateInformationAboutPagesSiteResponse>,
+  input: __S(1984, __c124, 0) as any as S.Schema<UpdateInformationAboutPagesSiteRequest>,
+  output: __S(3104, __c194, 0) as any as S.Schema<UpdateInformationAboutPagesSiteResponse>,
   errors: [BadRequest, Conflict, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9935,8 +9995,8 @@ export const updateInvitation: API.OperationMethod<
   UpdateInvitationError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2032, __c127, 0) as any as S.Schema<UpdateInvitationRequest>,
-  output: __S(3584, __c224, 0) as any as S.Schema<RepositoryInvitation>,
+  input: __S(2000, __c125, 0) as any as S.Schema<UpdateInvitationRequest>,
+  output: __S(3552, __c222, 0) as any as S.Schema<RepositoryInvitation>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9953,7 +10013,7 @@ export const updateOrgRuleset: API.OperationMethod<
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
   input: __S(2048, __c128, 0) as any as S.Schema<UpdateOrgRulesetRequest>,
-  output: __S(2693, __c168, 5) as any as S.Schema<RepositoryRuleset>,
+  output: __S(2661, __c166, 5) as any as S.Schema<RepositoryRuleset>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -9969,7 +10029,7 @@ export const updatePullRequestReviewProtection: API.OperationMethod<
   UpdatePullRequestReviewProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2096, __c131, 0) as any as S.Schema<UpdatePullRequestReviewProtectionRequest>,
+  input: __S(2064, __c129, 0) as any as S.Schema<UpdatePullRequestReviewProtectionRequest>,
   output: __S(4018, __c251, 2) as any as S.Schema<ProtectedBranchPullRequestReview>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
@@ -9986,8 +10046,8 @@ export const updateRelease: API.OperationMethod<
   UpdateReleaseError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2112, __c132, 0) as any as S.Schema<UpdateReleaseRequest>,
-  output: __S(2864, __c179, 0) as any as S.Schema<Release>,
+  input: __S(2080, __c130, 0) as any as S.Schema<UpdateReleaseRequest>,
+  output: __S(2832, __c177, 0) as any as S.Schema<Release>,
   errors: [NotFound],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -10003,8 +10063,8 @@ export const updateReleaseAsset: API.OperationMethod<
   UpdateReleaseAssetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2128, __c133, 0) as any as S.Schema<UpdateReleaseAssetRequest>,
-  output: __S(2832, __c177, 0) as any as S.Schema<ReleaseAsset>,
+  input: __S(2096, __c131, 0) as any as S.Schema<UpdateReleaseAssetRequest>,
+  output: __S(2800, __c175, 0) as any as S.Schema<ReleaseAsset>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -10020,8 +10080,8 @@ export const updateRepoRuleset: API.OperationMethod<
   UpdateRepoRulesetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2144, __c134, 0) as any as S.Schema<UpdateRepoRulesetRequest>,
-  output: __S(2693, __c168, 5) as any as S.Schema<RepositoryRuleset>,
+  input: __S(2112, __c132, 0) as any as S.Schema<UpdateRepoRulesetRequest>,
+  output: __S(2661, __c166, 5) as any as S.Schema<RepositoryRuleset>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -10037,8 +10097,8 @@ export const updateStatusCheckProtection: API.OperationMethod<
   UpdateStatusCheckProtectionError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2160, __c135, 0) as any as S.Schema<UpdateStatusCheckProtectionRequest>,
-  output: __S(704, __c44, 0) as any as S.Schema<StatusCheckPolicy>,
+  input: __S(2128, __c133, 0) as any as S.Schema<UpdateStatusCheckProtectionRequest>,
+  output: __S(720, __c45, 0) as any as S.Schema<StatusCheckPolicy>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -10054,8 +10114,8 @@ export const updateWebhook: API.OperationMethod<
   UpdateWebhookError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2176, __c136, 0) as any as S.Schema<UpdateWebhookRequest>,
-  output: __S(2961, __c185, 1) as any as S.Schema<Hook>,
+  input: __S(2144, __c134, 0) as any as S.Schema<UpdateWebhookRequest>,
+  output: __S(2929, __c183, 1) as any as S.Schema<Hook>,
   errors: [NotFound, UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -10071,8 +10131,8 @@ export const updateWebhookConfigForRepo: API.OperationMethod<
   UpdateWebhookConfigForRepoError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2192, __c137, 0) as any as S.Schema<UpdateWebhookConfigForRepoRequest>,
-  output: __S(2944, __c184, 0) as any as S.Schema<WebhookConfig>,
+  input: __S(2160, __c135, 0) as any as S.Schema<UpdateWebhookConfigForRepoRequest>,
+  output: __S(2912, __c182, 0) as any as S.Schema<WebhookConfig>,
   errors: [],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -10088,8 +10148,8 @@ export const uploadReleaseAsset: API.OperationMethod<
   UploadReleaseAssetError,
   GithubOpContext
 > = /*@__PURE__*/ API.make(() => ({
-  input: __S(2208, __c138, 0) as any as S.Schema<UploadReleaseAssetRequest>,
-  output: __S(2832, __c177, 0) as any as S.Schema<ReleaseAsset>,
+  input: __S(2176, __c136, 0) as any as S.Schema<UploadReleaseAssetRequest>,
+  output: __S(2800, __c175, 0) as any as S.Schema<ReleaseAsset>,
   errors: [UnprocessableEntity],
   protocol: GithubProtocol,
   retry: Retry.Retry,
@@ -10106,7 +10166,7 @@ function __c0(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          users: __S(3344, __c209, 0),
+          users: __S(3312, __c207, 0),
         }).pipe(
           T.Http({
             method: "POST",
@@ -10128,10 +10188,48 @@ function __c1(j: number): any {
 function __c2(j: number): any {
   switch (j) {
     case 0:
-      return S.Array(__S(3568, __c223, 0));
+      return S.Array(__S(3536, __c221, 0));
   }
 }
 function __c3(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
+        }).pipe(
+          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/stats/contributors", code: 200 }),
+        ),
+      ).annotate({ identifier: "GetContributorsStatsRequest" });
+    case 1:
+      return S.suspend(() =>
+        S.Struct({
+          w: S.optional(S.Number),
+          a: S.optional(S.Number),
+          d: S.optional(S.Number),
+          c: S.optional(S.Number),
+        }),
+      ).annotate({ identifier: "ContributorActivityWeeksItem" });
+    case 2:
+      return S.Array(__S(49, __c3, 1));
+    case 3:
+      return S.suspend(() =>
+        S.Struct({
+          author: S.NullOr(__S(3536, __c221, 0)),
+          total: S.Number,
+          weeks: __S(50, __c3, 2),
+        }),
+      ).annotate({ identifier: "ContributorActivity" });
+    case 4:
+      return S.Array(__S(51, __c3, 3));
+    case 5:
+      return S.suspend(() => __S(52, __c3, 4).pipe(T.RawResponseRoot())).annotate({
+        identifier: "GetContributorsStatsResponse",
+      });
+  }
+}
+function __c4(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10150,7 +10248,7 @@ function __c3(j: number): any {
       ).annotate({ identifier: "GetCustomDeploymentProtectionRuleRequest" });
   }
 }
-function __c4(j: number): any {
+function __c5(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10162,7 +10260,7 @@ function __c4(j: number): any {
       ).annotate({ identifier: "GetDeployKeyRequest" });
   }
 }
-function __c5(j: number): any {
+function __c6(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10180,7 +10278,7 @@ function __c5(j: number): any {
       ).annotate({ identifier: "GetDeploymentRequest" });
   }
 }
-function __c6(j: number): any {
+function __c7(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10199,7 +10297,7 @@ function __c6(j: number): any {
       ).annotate({ identifier: "GetDeploymentBranchPolicyRequest" });
   }
 }
-function __c7(j: number): any {
+function __c8(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10218,7 +10316,7 @@ function __c7(j: number): any {
       ).annotate({ identifier: "GetDeploymentStatusRequest" });
   }
 }
-function __c8(j: number): any {
+function __c9(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10236,7 +10334,7 @@ function __c8(j: number): any {
       ).annotate({ identifier: "GetEnvironmentRequest" });
   }
 }
-function __c9(j: number): any {
+function __c10(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10253,7 +10351,7 @@ function __c9(j: number): any {
       ).annotate({ identifier: "RepositoryHashAlgorithm" });
   }
 }
-function __c10(j: number): any {
+function __c11(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10266,7 +10364,7 @@ function __c10(j: number): any {
       ).annotate({ identifier: "GetLatestPagesBuildRequest" });
   }
 }
-function __c11(j: number): any {
+function __c12(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10279,8 +10377,8 @@ function __c11(j: number): any {
         S.Struct({
           url: S.String,
           status: S.String,
-          error: __S(176, __c11, 0),
-          pusher: S.NullOr(__S(3568, __c223, 0)),
+          error: __S(192, __c12, 0),
+          pusher: S.NullOr(__S(3536, __c221, 0)),
           commit: S.String,
           duration: S.Number,
           created_at: S.String,
@@ -10289,7 +10387,7 @@ function __c11(j: number): any {
       ).annotate({ identifier: "PageBuild" });
   }
 }
-function __c12(j: number): any {
+function __c13(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10298,17 +10396,6 @@ function __c12(j: number): any {
           repo: S.String.pipe(T.Label()),
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/releases/latest", code: 200 })),
       ).annotate({ identifier: "GetLatestReleaseRequest" });
-  }
-}
-function __c13(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          org: S.String.pipe(T.Label()),
-          ruleset_id: S.Number.pipe(T.Label()),
-        }).pipe(T.Http({ method: "GET", uri: "/orgs/{org}/rulesets/{ruleset_id}", code: 200 })),
-      ).annotate({ identifier: "GetOrgRulesetRequest" });
   }
 }
 function __c14(j: number): any {
@@ -10335,6 +10422,17 @@ function __c15(j: number): any {
       return S.suspend(() =>
         S.Struct({
           org: S.String.pipe(T.Label()),
+          ruleset_id: S.Number.pipe(T.Label()),
+        }).pipe(T.Http({ method: "GET", uri: "/orgs/{org}/rulesets/{ruleset_id}", code: 200 })),
+      ).annotate({ identifier: "GetOrgRulesetRequest" });
+  }
+}
+function __c16(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          org: S.String.pipe(T.Label()),
           per_page: S.optional(S.Number.pipe(T.Query())),
           page: S.optional(S.Number.pipe(T.Query())),
           targets: S.optional(S.String.pipe(T.Query())),
@@ -10342,17 +10440,17 @@ function __c15(j: number): any {
       ).annotate({ identifier: "GetOrgRulesetsRequest" });
   }
 }
-function __c16(j: number): any {
+function __c17(j: number): any {
   switch (j) {
     case 0:
-      return S.Array(__S(2693, __c168, 5));
+      return S.Array(__S(2661, __c166, 5));
     case 1:
-      return S.suspend(() => __S(256, __c16, 0).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(272, __c17, 0).pipe(T.RawResponseRoot())).annotate({
         identifier: "GetOrgRulesetsResponse",
       });
   }
 }
-function __c17(j: number): any {
+function __c18(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10369,7 +10467,7 @@ function __c17(j: number): any {
       ).annotate({ identifier: "GetOrgRuleSuiteRequest" });
   }
 }
-function __c18(j: number): any {
+function __c19(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10382,7 +10480,7 @@ function __c18(j: number): any {
     case 1:
       return S.suspend(() =>
         S.Struct({
-          rule_source: S.optional(__S(288, __c18, 0)),
+          rule_source: S.optional(__S(304, __c19, 0)),
           enforcement: S.optional(S.String),
           result: S.optional(S.String),
           rule_type: S.optional(S.String),
@@ -10390,7 +10488,7 @@ function __c18(j: number): any {
         }),
       ).annotate({ identifier: "RuleSuiteRuleEvaluationsItem" });
     case 2:
-      return S.Array(__S(289, __c18, 1));
+      return S.Array(__S(305, __c19, 1));
     case 3:
       return S.suspend(() =>
         S.Struct({
@@ -10405,12 +10503,12 @@ function __c18(j: number): any {
           pushed_at: S.optional(S.String),
           result: S.optional(S.String),
           evaluation_result: S.optional(S.NullOr(S.String)),
-          rule_evaluations: S.optional(__S(290, __c18, 2)),
+          rule_evaluations: S.optional(__S(306, __c19, 2)),
         }),
       ).annotate({ identifier: "RuleSuite" });
   }
 }
-function __c19(j: number): any {
+function __c20(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10428,7 +10526,7 @@ function __c19(j: number): any {
       ).annotate({ identifier: "GetOrgRuleSuitesRequest" });
   }
 }
-function __c20(j: number): any {
+function __c21(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10447,14 +10545,14 @@ function __c20(j: number): any {
         }),
       ).annotate({ identifier: "RuleSuitesItem" });
     case 1:
-      return S.Array(__S(320, __c20, 0));
+      return S.Array(__S(336, __c21, 0));
     case 2:
-      return S.suspend(() => __S(321, __c20, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(337, __c21, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "GetOrgRuleSuitesResponse",
       });
   }
 }
-function __c21(j: number): any {
+function __c22(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10465,7 +10563,7 @@ function __c21(j: number): any {
       ).annotate({ identifier: "GetPagesRequest" });
   }
 }
-function __c22(j: number): any {
+function __c23(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10483,7 +10581,7 @@ function __c22(j: number): any {
       ).annotate({ identifier: "GetPagesBuildRequest" });
   }
 }
-function __c23(j: number): any {
+function __c24(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10501,7 +10599,7 @@ function __c23(j: number): any {
       ).annotate({ identifier: "GetPagesDeploymentRequest" });
   }
 }
-function __c24(j: number): any {
+function __c25(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10546,13 +10644,13 @@ function __c24(j: number): any {
     case 2:
       return S.suspend(() =>
         S.Struct({
-          domain: S.optional(__S(385, __c24, 1)),
-          alt_domain: S.optional(S.NullOr(__S(385, __c24, 1))),
+          domain: S.optional(__S(401, __c25, 1)),
+          alt_domain: S.optional(S.NullOr(__S(401, __c25, 1))),
         }),
       ).annotate({ identifier: "PagesHealthCheck" });
   }
 }
-function __c25(j: number): any {
+function __c26(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10566,13 +10664,13 @@ function __c25(j: number): any {
     case 1:
       return S.suspend(() =>
         S.Struct({
-          all: __S(4224, __c264, 0),
-          owner: __S(4224, __c264, 0),
+          all: __S(4240, __c265, 0),
+          owner: __S(4240, __c265, 0),
         }),
       ).annotate({ identifier: "ParticipationStats" });
   }
 }
-function __c26(j: number): any {
+function __c27(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10588,19 +10686,6 @@ function __c26(j: number): any {
           }),
         ),
       ).annotate({ identifier: "GetPullRequestReviewProtectionRequest" });
-  }
-}
-function __c27(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-        }).pipe(
-          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/stats/punch_card", code: 200 }),
-        ),
-      ).annotate({ identifier: "GetPunchCardStatsRequest" });
   }
 }
 function __c28(j: number): any {
@@ -10634,12 +10719,25 @@ function __c29(j: number): any {
         S.Struct({
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
+        }).pipe(
+          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/stats/punch_card", code: 200 }),
+        ),
+      ).annotate({ identifier: "GetPunchCardStatsRequest" });
+  }
+}
+function __c30(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
           ref: S.optional(S.String.pipe(T.Query())),
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/readme", code: 200 })),
       ).annotate({ identifier: "GetReadmeRequest" });
   }
 }
-function __c30(j: number): any {
+function __c31(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10663,14 +10761,14 @@ function __c30(j: number): any {
           git_url: S.NullOr(S.String),
           html_url: S.NullOr(S.String),
           download_url: S.NullOr(S.String),
-          _links: __S(480, __c30, 0),
+          _links: __S(496, __c31, 0),
           target: S.optional(S.String),
           submodule_git_url: S.optional(S.String),
         }),
       ).annotate({ identifier: "ContentFile" });
   }
 }
-function __c31(j: number): any {
+function __c32(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10683,7 +10781,7 @@ function __c31(j: number): any {
       ).annotate({ identifier: "GetReadmeInDirectoryRequest" });
   }
 }
-function __c32(j: number): any {
+function __c33(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10697,7 +10795,7 @@ function __c32(j: number): any {
       ).annotate({ identifier: "GetReleaseRequest" });
   }
 }
-function __c33(j: number): any {
+function __c34(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10715,7 +10813,7 @@ function __c33(j: number): any {
       ).annotate({ identifier: "GetReleaseAssetRequest" });
   }
 }
-function __c34(j: number): any {
+function __c35(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10729,7 +10827,7 @@ function __c34(j: number): any {
       ).annotate({ identifier: "GetReleaseByTagRequest" });
   }
 }
-function __c35(j: number): any {
+function __c36(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10744,7 +10842,7 @@ function __c35(j: number): any {
       ).annotate({ identifier: "GetRepoRulesetRequest" });
   }
 }
-function __c36(j: number): any {
+function __c37(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10766,19 +10864,19 @@ function __c36(j: number): any {
       return S.suspend(() =>
         S.Struct({
           version_id: S.Number,
-          actor: __S(592, __c37, 0),
+          actor: __S(608, __c38, 0),
           updated_at: S.String,
         }),
       ).annotate({ identifier: "RulesetVersion" });
     case 2:
-      return S.Array(__S(577, __c36, 1));
+      return S.Array(__S(593, __c37, 1));
     case 3:
-      return S.suspend(() => __S(578, __c36, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(594, __c37, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "GetRepoRulesetHistoryResponse",
       });
   }
 }
-function __c37(j: number): any {
+function __c38(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10789,7 +10887,7 @@ function __c37(j: number): any {
       ).annotate({ identifier: "RulesetVersionActor" });
   }
 }
-function __c38(j: number): any {
+function __c39(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10804,7 +10902,7 @@ function __c38(j: number): any {
       ).annotate({ identifier: "GetRepoRulesetsRequest" });
   }
 }
-function __c39(j: number): any {
+function __c40(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10825,29 +10923,11 @@ function __c39(j: number): any {
       return S.suspend(() =>
         S.Struct({
           version_id: S.Number,
-          actor: __S(592, __c37, 0),
+          actor: __S(608, __c38, 0),
           updated_at: S.String,
           state: S.Unknown,
         }),
       ).annotate({ identifier: "GetRepoRulesetVersionResponse" });
-  }
-}
-function __c40(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-          rule_suite_id: S.Number.pipe(T.Label()),
-        }).pipe(
-          T.Http({
-            method: "GET",
-            uri: "/repos/{owner}/{repo}/rulesets/rule-suites/{rule_suite_id}",
-            code: 200,
-          }),
-        ),
-      ).annotate({ identifier: "GetRepoRuleSuiteRequest" });
   }
 }
 function __c41(j: number): any {
@@ -10875,6 +10955,24 @@ function __c42(j: number): any {
         S.Struct({
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
+          rule_suite_id: S.Number.pipe(T.Label()),
+        }).pipe(
+          T.Http({
+            method: "GET",
+            uri: "/repos/{owner}/{repo}/rulesets/rule-suites/{rule_suite_id}",
+            code: 200,
+          }),
+        ),
+      ).annotate({ identifier: "GetRepoRuleSuiteRequest" });
+  }
+}
+function __c43(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
           ref: S.optional(S.String.pipe(T.Query())),
           time_period: S.optional(S.String.pipe(T.Query())),
           actor_name: S.optional(S.String.pipe(T.Query())),
@@ -10888,7 +10986,7 @@ function __c42(j: number): any {
       ).annotate({ identifier: "GetRepoRuleSuitesRequest" });
   }
 }
-function __c43(j: number): any {
+function __c44(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10906,21 +11004,21 @@ function __c43(j: number): any {
       ).annotate({ identifier: "GetStatusChecksProtectionRequest" });
   }
 }
-function __c44(j: number): any {
+function __c45(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
           url: S.String,
           strict: S.Boolean,
-          contexts: __S(3344, __c209, 0),
+          contexts: __S(3312, __c207, 0),
           checks: __S(4033, __c252, 1),
           contexts_url: S.String,
         }),
       ).annotate({ identifier: "StatusCheckPolicy" });
   }
 }
-function __c45(j: number): any {
+function __c46(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10938,7 +11036,7 @@ function __c45(j: number): any {
       ).annotate({ identifier: "GetTeamsWithAccessToProtectedBranchRequest" });
   }
 }
-function __c46(j: number): any {
+function __c47(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10959,14 +11057,14 @@ function __c46(j: number): any {
         }),
       ).annotate({ identifier: "ContentTraffic" });
     case 2:
-      return S.Array(__S(737, __c46, 1));
+      return S.Array(__S(753, __c47, 1));
     case 3:
-      return S.suspend(() => __S(738, __c46, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(754, __c47, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "GetTopPathsResponse",
       });
   }
 }
-function __c47(j: number): any {
+function __c48(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -10990,14 +11088,14 @@ function __c47(j: number): any {
         }),
       ).annotate({ identifier: "ReferrerTraffic" });
     case 2:
-      return S.Array(__S(753, __c47, 1));
+      return S.Array(__S(769, __c48, 1));
     case 3:
-      return S.suspend(() => __S(754, __c47, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(770, __c48, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "GetTopReferrersResponse",
       });
   }
 }
-function __c48(j: number): any {
+function __c49(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11015,7 +11113,7 @@ function __c48(j: number): any {
       ).annotate({ identifier: "GetUsersWithAccessToProtectedBranchRequest" });
   }
 }
-function __c49(j: number): any {
+function __c50(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11030,12 +11128,12 @@ function __c49(j: number): any {
         S.Struct({
           count: S.Number,
           uniques: S.Number,
-          views: __S(4129, __c258, 1),
+          views: __S(4193, __c262, 1),
         }),
       ).annotate({ identifier: "ViewTraffic" });
   }
 }
-function __c50(j: number): any {
+function __c51(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11047,7 +11145,7 @@ function __c50(j: number): any {
       ).annotate({ identifier: "GetWebhookRequest" });
   }
 }
-function __c51(j: number): any {
+function __c52(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11059,52 +11157,6 @@ function __c51(j: number): any {
           T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/hooks/{hook_id}/config", code: 200 }),
         ),
       ).annotate({ identifier: "GetWebhookConfigForRepoRequest" });
-  }
-}
-function __c52(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-          hook_id: S.Number.pipe(T.Label()),
-          delivery_id: S.Number.pipe(T.Label()),
-        }).pipe(
-          T.Http({
-            method: "GET",
-            uri: "/repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}",
-            code: 200,
-          }),
-        ),
-      ).annotate({ identifier: "GetWebhookDeliveryRequest" });
-    case 1:
-      return S.suspend(() =>
-        S.Struct({
-          headers: S.NullOr(__S(3600, __c225, 0)),
-          payload: S.NullOr(__S(3600, __c225, 0)),
-        }),
-      ).annotate({ identifier: "HookDeliveryRequest" });
-    case 2:
-      return S.suspend(() =>
-        S.Struct({
-          id: S.Number,
-          guid: S.String,
-          delivered_at: S.String,
-          redelivery: S.Boolean,
-          duration: S.Number,
-          status: S.String,
-          status_code: S.Number,
-          event: S.String,
-          action: S.NullOr(S.String),
-          installation_id: S.NullOr(S.Number),
-          repository_id: S.NullOr(S.Number),
-          throttled_at: S.optional(S.NullOr(S.String)),
-          url: S.optional(S.String),
-          request: __S(833, __c52, 1),
-          response: __S(833, __c52, 1),
-        }),
-      ).annotate({ identifier: "HookDelivery" });
   }
 }
 function __c53(j: number): any {
@@ -11134,6 +11186,52 @@ function __c54(j: number): any {
         S.Struct({
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
+          hook_id: S.Number.pipe(T.Label()),
+          delivery_id: S.Number.pipe(T.Label()),
+        }).pipe(
+          T.Http({
+            method: "GET",
+            uri: "/repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}",
+            code: 200,
+          }),
+        ),
+      ).annotate({ identifier: "GetWebhookDeliveryRequest" });
+    case 1:
+      return S.suspend(() =>
+        S.Struct({
+          headers: S.NullOr(__S(3568, __c223, 0)),
+          payload: S.NullOr(__S(3568, __c223, 0)),
+        }),
+      ).annotate({ identifier: "HookDeliveryRequest" });
+    case 2:
+      return S.suspend(() =>
+        S.Struct({
+          id: S.Number,
+          guid: S.String,
+          delivered_at: S.String,
+          redelivery: S.Boolean,
+          duration: S.Number,
+          status: S.String,
+          status_code: S.Number,
+          event: S.String,
+          action: S.NullOr(S.String),
+          installation_id: S.NullOr(S.Number),
+          repository_id: S.NullOr(S.Number),
+          throttled_at: S.optional(S.NullOr(S.String)),
+          url: S.optional(S.String),
+          request: __S(865, __c54, 1),
+          response: __S(865, __c54, 1),
+        }),
+      ).annotate({ identifier: "HookDelivery" });
+  }
+}
+function __c55(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
           direction: S.optional(S.String.pipe(T.Query())),
           per_page: S.optional(S.Number.pipe(T.Query())),
           before: S.optional(S.String.pipe(T.Query())),
@@ -11154,18 +11252,18 @@ function __c54(j: number): any {
           ref: S.String,
           timestamp: S.String,
           activity_type: S.String,
-          actor: S.NullOr(__S(3568, __c223, 0)),
+          actor: S.NullOr(__S(3536, __c221, 0)),
         }),
       ).annotate({ identifier: "Activity" });
     case 2:
-      return S.Array(__S(865, __c54, 1));
+      return S.Array(__S(881, __c55, 1));
     case 3:
-      return S.suspend(() => __S(866, __c54, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(882, __c55, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListActivitiesResponse",
       });
   }
 }
-function __c55(j: number): any {
+function __c56(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11188,23 +11286,23 @@ function __c55(j: number): any {
     case 1:
       return S.suspend(() =>
         S.Struct({
-          bundle: S.optional(__S(1856, __c116, 0)),
+          bundle: S.optional(__S(1808, __c113, 0)),
           repository_id: S.optional(S.Number),
           bundle_url: S.optional(S.String),
           initiator: S.optional(S.String),
         }),
       ).annotate({ identifier: "ListAttestationsResponseAttestationsItem" });
     case 2:
-      return S.Array(__S(881, __c55, 1));
+      return S.Array(__S(897, __c56, 1));
     case 3:
       return S.suspend(() =>
         S.Struct({
-          attestations: S.optional(__S(882, __c55, 2)),
+          attestations: S.optional(__S(898, __c56, 2)),
         }),
       ).annotate({ identifier: "ListAttestationsResponse" });
   }
 }
-function __c56(j: number): any {
+function __c57(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11214,14 +11312,14 @@ function __c56(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/autolinks", code: 200 })),
       ).annotate({ identifier: "ListAutolinksRequest" });
     case 1:
-      return S.Array(__S(2080, __c130, 0));
+      return S.Array(__S(2032, __c127, 0));
     case 2:
-      return S.suspend(() => __S(897, __c56, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(913, __c57, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListAutolinksResponse",
       });
   }
 }
-function __c57(j: number): any {
+function __c58(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11237,21 +11335,21 @@ function __c57(j: number): any {
       return S.suspend(() =>
         S.Struct({
           name: S.String,
-          commit: __S(1648, __c103, 0),
+          commit: __S(3968, __c248, 0),
           protected: S.Boolean,
           protection: S.optional(__S(4049, __c253, 1)),
           protection_url: S.optional(S.String),
         }),
       ).annotate({ identifier: "ShortBranch" });
     case 2:
-      return S.Array(__S(913, __c57, 1));
+      return S.Array(__S(929, __c58, 1));
     case 3:
-      return S.suspend(() => __S(914, __c57, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(930, __c58, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListBranchesResponse",
       });
   }
 }
-function __c58(j: number): any {
+function __c59(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11271,19 +11369,19 @@ function __c58(j: number): any {
       return S.suspend(() =>
         S.Struct({
           name: S.String,
-          commit: __S(1648, __c103, 0),
+          commit: __S(3968, __c248, 0),
           protected: S.Boolean,
         }),
       ).annotate({ identifier: "BranchShort" });
     case 2:
-      return S.Array(__S(929, __c58, 1));
+      return S.Array(__S(945, __c59, 1));
     case 3:
-      return S.suspend(() => __S(930, __c58, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(946, __c59, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListBranchesForHeadCommitResponse",
       });
   }
 }
-function __c59(j: number): any {
+function __c60(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11297,14 +11395,14 @@ function __c59(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/collaborators", code: 200 })),
       ).annotate({ identifier: "ListCollaboratorsRequest" });
     case 1:
-      return S.Array(__S(4257, __c266, 1));
+      return S.Array(__S(4273, __c267, 1));
     case 2:
-      return S.suspend(() => __S(945, __c59, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(961, __c60, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListCollaboratorsResponse",
       });
   }
 }
-function __c60(j: number): any {
+function __c61(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11324,17 +11422,17 @@ function __c60(j: number): any {
       ).annotate({ identifier: "ListCommentsForCommitRequest" });
   }
 }
-function __c61(j: number): any {
+function __c62(j: number): any {
   switch (j) {
     case 0:
-      return S.Array(__S(2256, __c141, 0));
+      return S.Array(__S(2224, __c139, 0));
     case 1:
-      return S.suspend(() => __S(976, __c61, 0).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(992, __c62, 0).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListCommentsForCommitResponse",
       });
   }
 }
-function __c62(j: number): any {
+function __c63(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11347,9 +11445,11 @@ function __c62(j: number): any {
       ).annotate({ identifier: "ListCommitCommentsForRepoRequest" });
   }
 }
-function __c63(j: number): any {
+function __c64(j: number): any {
   switch (j) {
     case 0:
+      return S.Array(__S(3992, __c249, 8));
+    case 1:
       return S.suspend(() =>
         S.Struct({
           owner: S.String.pipe(T.Label()),
@@ -11364,31 +11464,9 @@ function __c63(j: number): any {
           page: S.optional(S.Number.pipe(T.Query())),
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/commits", code: 200 })),
       ).annotate({ identifier: "ListCommitsRequest" });
-    case 1:
-      return S.suspend(() => __S(1632, __c102, 0).pipe(T.RawResponseRoot())).annotate({
-        identifier: "ListCommitsResponse",
-      });
-  }
-}
-function __c64(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-          ref: S.String.pipe(T.Label()),
-          per_page: S.optional(S.Number.pipe(T.Query())),
-          page: S.optional(S.Number.pipe(T.Query())),
-        }).pipe(
-          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/commits/{ref}/statuses", code: 200 }),
-        ),
-      ).annotate({ identifier: "ListCommitStatusesForRefRequest" });
-    case 1:
-      return S.Array(__S(2320, __c145, 0));
     case 2:
-      return S.suspend(() => __S(1025, __c64, 1).pipe(T.RawResponseRoot())).annotate({
-        identifier: "ListCommitStatusesForRefResponse",
+      return S.suspend(() => __S(1024, __c64, 0).pipe(T.RawResponseRoot())).annotate({
+        identifier: "ListCommitsResponse",
       });
   }
 }
@@ -11420,6 +11498,28 @@ function __c66(j: number): any {
   }
 }
 function __c67(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
+          ref: S.String.pipe(T.Label()),
+          per_page: S.optional(S.Number.pipe(T.Query())),
+          page: S.optional(S.Number.pipe(T.Query())),
+        }).pipe(
+          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/commits/{ref}/statuses", code: 200 }),
+        ),
+      ).annotate({ identifier: "ListCommitStatusesForRefRequest" });
+    case 1:
+      return S.Array(__S(2288, __c143, 0));
+    case 2:
+      return S.suspend(() => __S(1073, __c67, 1).pipe(T.RawResponseRoot())).annotate({
+        identifier: "ListCommitStatusesForRefResponse",
+      });
+  }
+}
+function __c68(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11459,14 +11559,14 @@ function __c67(j: number): any {
         }),
       ).annotate({ identifier: "Contributor" });
     case 2:
-      return S.Array(__S(1073, __c67, 1));
+      return S.Array(__S(1089, __c68, 1));
     case 3:
-      return S.suspend(() => __S(1074, __c67, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1090, __c68, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListContributorsResponse",
       });
   }
 }
-function __c68(j: number): any {
+function __c69(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11485,17 +11585,17 @@ function __c68(j: number): any {
         ),
       ).annotate({ identifier: "ListCustomDeploymentRuleIntegrationsRequest" });
     case 1:
-      return S.Array(__S(2480, __c155, 0));
+      return S.Array(__S(2448, __c153, 0));
     case 2:
       return S.suspend(() =>
         S.Struct({
           total_count: S.optional(S.Number),
-          available_custom_deployment_protection_rule_integrations: S.optional(__S(1089, __c68, 1)),
+          available_custom_deployment_protection_rule_integrations: S.optional(__S(1105, __c69, 1)),
         }),
       ).annotate({ identifier: "ListCustomDeploymentRuleIntegrationsResponse" });
   }
 }
-function __c69(j: number): any {
+function __c70(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11507,14 +11607,14 @@ function __c69(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/keys", code: 200 })),
       ).annotate({ identifier: "ListDeployKeysRequest" });
     case 1:
-      return S.Array(__S(2352, __c147, 0));
+      return S.Array(__S(2320, __c145, 0));
     case 2:
-      return S.suspend(() => __S(1105, __c69, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1121, __c70, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListDeployKeysResponse",
       });
   }
 }
-function __c70(j: number): any {
+function __c71(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11533,17 +11633,17 @@ function __c70(j: number): any {
         ),
       ).annotate({ identifier: "ListDeploymentBranchPoliciesRequest" });
     case 1:
-      return S.Array(__S(2432, __c152, 0));
+      return S.Array(__S(2400, __c150, 0));
     case 2:
       return S.suspend(() =>
         S.Struct({
           total_count: S.Number,
-          branch_policies: __S(1121, __c70, 1),
+          branch_policies: __S(1137, __c71, 1),
         }),
       ).annotate({ identifier: "ListDeploymentBranchPoliciesResponse" });
   }
 }
-function __c71(j: number): any {
+function __c72(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11559,14 +11659,14 @@ function __c71(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/deployments", code: 200 })),
       ).annotate({ identifier: "ListDeploymentsRequest" });
     case 1:
-      return S.Array(__S(2384, __c149, 0));
+      return S.Array(__S(2352, __c147, 0));
     case 2:
-      return S.suspend(() => __S(1137, __c71, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1153, __c72, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListDeploymentsResponse",
       });
   }
 }
-function __c72(j: number): any {
+function __c73(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11585,14 +11685,14 @@ function __c72(j: number): any {
         ),
       ).annotate({ identifier: "ListDeploymentStatusesRequest" });
     case 1:
-      return S.Array(__S(2512, __c157, 0));
+      return S.Array(__S(2480, __c155, 0));
     case 2:
-      return S.suspend(() => __S(1153, __c72, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1169, __c73, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListDeploymentStatusesResponse",
       });
   }
 }
-function __c73(j: number): any {
+function __c74(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11609,14 +11709,14 @@ function __c73(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/user/repos", code: 200 })),
       ).annotate({ identifier: "ListForAuthenticatedUserRequest" });
     case 1:
-      return S.Array(__S(2562, __c160, 2));
+      return S.Array(__S(2530, __c158, 2));
     case 2:
-      return S.suspend(() => __S(1169, __c73, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1185, __c74, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListForAuthenticatedUserResponse",
       });
   }
 }
-function __c74(j: number): any {
+function __c75(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11630,17 +11730,17 @@ function __c74(j: number): any {
       ).annotate({ identifier: "ListForksRequest" });
   }
 }
-function __c75(j: number): any {
+function __c76(j: number): any {
   switch (j) {
     case 0:
-      return S.Array(__S(3651, __c228, 3));
+      return S.Array(__S(3619, __c226, 3));
     case 1:
-      return S.suspend(() => __S(1200, __c75, 0).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1216, __c76, 0).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListForksResponse",
       });
   }
 }
-function __c76(j: number): any {
+function __c77(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11653,21 +11753,6 @@ function __c76(j: number): any {
           page: S.optional(S.Number.pipe(T.Query())),
         }).pipe(T.Http({ method: "GET", uri: "/orgs/{org}/repos", code: 200 })),
       ).annotate({ identifier: "ListForOrgRequest" });
-  }
-}
-function __c77(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          username: S.String.pipe(T.Label()),
-          type: S.optional(S.String.pipe(T.Query())),
-          sort: S.optional(S.String.pipe(T.Query())),
-          direction: S.optional(S.String.pipe(T.Query())),
-          per_page: S.optional(S.Number.pipe(T.Query())),
-          page: S.optional(S.Number.pipe(T.Query())),
-        }).pipe(T.Http({ method: "GET", uri: "/users/{username}/repos", code: 200 })),
-      ).annotate({ identifier: "ListForUserRequest" });
   }
 }
 function __c78(j: number): any {
@@ -11688,6 +11773,21 @@ function __c79(j: number): any {
     case 0:
       return S.suspend(() =>
         S.Struct({
+          username: S.String.pipe(T.Label()),
+          type: S.optional(S.String.pipe(T.Query())),
+          sort: S.optional(S.String.pipe(T.Query())),
+          direction: S.optional(S.String.pipe(T.Query())),
+          per_page: S.optional(S.Number.pipe(T.Query())),
+          page: S.optional(S.Number.pipe(T.Query())),
+        }).pipe(T.Http({ method: "GET", uri: "/users/{username}/repos", code: 200 })),
+      ).annotate({ identifier: "ListForUserRequest" });
+  }
+}
+function __c80(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           per_page: S.optional(S.Number.pipe(T.Query())),
@@ -11696,17 +11796,17 @@ function __c79(j: number): any {
       ).annotate({ identifier: "ListInvitationsRequest" });
   }
 }
-function __c80(j: number): any {
+function __c81(j: number): any {
   switch (j) {
     case 0:
-      return S.Array(__S(3584, __c224, 0));
+      return S.Array(__S(3552, __c222, 0));
     case 1:
-      return S.suspend(() => __S(1280, __c80, 0).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1296, __c81, 0).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListInvitationsResponse",
       });
   }
 }
-function __c81(j: number): any {
+function __c82(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11717,7 +11817,7 @@ function __c81(j: number): any {
       ).annotate({ identifier: "ListInvitationsForAuthenticatedUserRequest" });
   }
 }
-function __c82(j: number): any {
+function __c83(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11740,14 +11840,14 @@ function __c82(j: number): any {
         }),
       ).annotate({ identifier: "IssueType" });
     case 2:
-      return S.Array(/*@__PURE__*/ S.NullOr(__S(1313, __c82, 1)));
+      return S.Array(/*@__PURE__*/ S.NullOr(__S(1329, __c83, 1)));
     case 3:
-      return S.suspend(() => __S(1314, __c82, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1330, __c83, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListIssueTypesResponse",
       });
   }
 }
-function __c83(j: number): any {
+function __c84(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11759,12 +11859,12 @@ function __c83(j: number): any {
     case 1:
       return S.Record(S.String, S.Number);
     case 2:
-      return S.suspend(() => __S(1329, __c83, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1345, __c84, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListLanguagesResponse",
       });
   }
 }
-function __c84(j: number): any {
+function __c85(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11776,14 +11876,14 @@ function __c84(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/pages/builds", code: 200 })),
       ).annotate({ identifier: "ListPagesBuildsRequest" });
     case 1:
-      return S.Array(__S(177, __c11, 1));
+      return S.Array(__S(193, __c12, 1));
     case 2:
-      return S.suspend(() => __S(1345, __c84, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1361, __c85, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListPagesBuildsResponse",
       });
   }
 }
-function __c85(j: number): any {
+function __c86(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11793,7 +11893,7 @@ function __c85(j: number): any {
       ).annotate({ identifier: "ListPublicRequest" });
   }
 }
-function __c86(j: number): any {
+function __c87(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11821,11 +11921,11 @@ function __c86(j: number): any {
           description: S.String,
           color: S.String,
           default: S.Boolean,
-          archived_by: S.NullOr(__S(3568, __c223, 0)),
+          archived_by: S.NullOr(__S(3536, __c221, 0)),
         }),
       ).annotate({ identifier: "PullRequestSimpleLabelsItem" });
     case 2:
-      return S.Array(__S(1377, __c86, 1));
+      return S.Array(__S(1393, __c87, 1));
     case 3:
       return S.suspend(() =>
         S.Struct({
@@ -11838,7 +11938,7 @@ function __c86(j: number): any {
           state: S.String,
           title: S.String,
           description: S.NullOr(S.String),
-          creator: S.NullOr(__S(3568, __c223, 0)),
+          creator: S.NullOr(__S(3536, __c221, 0)),
           open_issues: S.Number,
           closed_issues: S.Number,
           created_at: S.String,
@@ -11852,9 +11952,9 @@ function __c86(j: number): any {
         S.Struct({
           label: S.String,
           ref: S.String,
-          repo: __S(2562, __c160, 2),
+          repo: __S(2530, __c158, 2),
           sha: S.String,
-          user: S.NullOr(__S(3568, __c223, 0)),
+          user: S.NullOr(__S(3536, __c221, 0)),
         }),
       ).annotate({ identifier: "PullRequestSimpleHead" });
     case 5:
@@ -11866,20 +11966,20 @@ function __c86(j: number): any {
     case 6:
       return S.suspend(() =>
         S.Struct({
-          comments: __S(1381, __c86, 5),
-          commits: __S(1381, __c86, 5),
-          statuses: __S(1381, __c86, 5),
-          html: __S(1381, __c86, 5),
-          issue: __S(1381, __c86, 5),
-          review_comments: __S(1381, __c86, 5),
-          review_comment: __S(1381, __c86, 5),
-          self: __S(1381, __c86, 5),
+          comments: __S(1397, __c87, 5),
+          commits: __S(1397, __c87, 5),
+          statuses: __S(1397, __c87, 5),
+          html: __S(1397, __c87, 5),
+          issue: __S(1397, __c87, 5),
+          review_comments: __S(1397, __c87, 5),
+          review_comment: __S(1397, __c87, 5),
+          self: __S(1397, __c87, 5),
         }),
       ).annotate({ identifier: "PullRequestSimpleLinks" });
     case 7:
       return S.suspend(() =>
         S.Struct({
-          enabled_by: __S(3568, __c223, 0),
+          enabled_by: __S(3536, __c221, 0),
           merge_method: S.String,
           commit_title: S.String,
           commit_message: S.String,
@@ -11895,7 +11995,7 @@ function __c86(j: number): any {
     case 9:
       return S.suspend(() =>
         S.Struct({
-          base: __S(1384, __c86, 8),
+          base: __S(1400, __c87, 8),
           size: S.optional(S.Number),
           position: S.optional(S.Number),
           id: S.optional(S.Number),
@@ -11921,38 +12021,38 @@ function __c86(j: number): any {
           state: S.String,
           locked: S.Boolean,
           title: S.String,
-          user: S.NullOr(__S(3568, __c223, 0)),
+          user: S.NullOr(__S(3536, __c221, 0)),
           body: S.NullOr(S.String),
-          labels: __S(1378, __c86, 2),
-          milestone: S.NullOr(__S(1379, __c86, 3)),
+          labels: __S(1394, __c87, 2),
+          milestone: S.NullOr(__S(1395, __c87, 3)),
           active_lock_reason: S.optional(S.NullOr(S.String)),
           created_at: S.String,
           updated_at: S.String,
           closed_at: S.NullOr(S.String),
           merged_at: S.NullOr(S.String),
           merge_commit_sha: S.NullOr(S.String),
-          assignee: S.NullOr(__S(3568, __c223, 0)),
+          assignee: S.NullOr(__S(3536, __c221, 0)),
           assignees: S.optional(__S(32, __c2, 0)),
           requested_reviewers: S.optional(__S(32, __c2, 0)),
-          requested_teams: S.optional(__S(4179, __c261, 3)),
-          head: __S(1380, __c86, 4),
-          base: __S(1380, __c86, 4),
-          _links: __S(1382, __c86, 6),
+          requested_teams: S.optional(__S(4163, __c260, 3)),
+          head: __S(1396, __c87, 4),
+          base: __S(1396, __c87, 4),
+          _links: __S(1398, __c87, 6),
           author_association: S.String,
-          auto_merge: S.NullOr(__S(1383, __c86, 7)),
-          stack: S.optional(S.NullOr(__S(1385, __c86, 9))),
+          auto_merge: S.NullOr(__S(1399, __c87, 7)),
+          stack: S.optional(S.NullOr(__S(1401, __c87, 9))),
           draft: S.optional(S.Boolean),
         }),
       ).annotate({ identifier: "PullRequestSimple" });
     case 11:
-      return S.Array(__S(1386, __c86, 10));
+      return S.Array(__S(1402, __c87, 10));
     case 12:
-      return S.suspend(() => __S(1387, __c86, 11).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1403, __c87, 11).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListPullRequestsAssociatedWithCommitResponse",
       });
   }
 }
-function __c87(j: number): any {
+function __c88(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -11971,27 +12071,8 @@ function __c87(j: number): any {
         ),
       ).annotate({ identifier: "ListReleaseAssetsRequest" });
     case 1:
-      return S.suspend(() => __S(2848, __c178, 0).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(2816, __c176, 0).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListReleaseAssetsResponse",
-      });
-  }
-}
-function __c88(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-          per_page: S.optional(S.Number.pipe(T.Query())),
-          page: S.optional(S.Number.pipe(T.Query())),
-        }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/releases", code: 200 })),
-      ).annotate({ identifier: "ListReleasesRequest" });
-    case 1:
-      return S.Array(__S(2864, __c179, 0));
-    case 2:
-      return S.suspend(() => __S(1409, __c88, 1).pipe(T.RawResponseRoot())).annotate({
-        identifier: "ListReleasesResponse",
       });
   }
 }
@@ -12004,23 +12085,13 @@ function __c89(j: number): any {
           repo: S.String.pipe(T.Label()),
           per_page: S.optional(S.Number.pipe(T.Query())),
           page: S.optional(S.Number.pipe(T.Query())),
-        }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/tags", code: 200 })),
-      ).annotate({ identifier: "ListTagsRequest" });
+        }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/releases", code: 200 })),
+      ).annotate({ identifier: "ListReleasesRequest" });
     case 1:
-      return S.suspend(() =>
-        S.Struct({
-          name: S.String,
-          commit: __S(1648, __c103, 0),
-          zipball_url: S.String,
-          tarball_url: S.String,
-          node_id: S.String,
-        }),
-      ).annotate({ identifier: "Tag" });
+      return S.Array(__S(2832, __c177, 0));
     case 2:
-      return S.Array(__S(1425, __c89, 1));
-    case 3:
-      return S.suspend(() => __S(1426, __c89, 2).pipe(T.RawResponseRoot())).annotate({
-        identifier: "ListTagsResponse",
+      return S.suspend(() => __S(1425, __c89, 1).pipe(T.RawResponseRoot())).annotate({
+        identifier: "ListReleasesResponse",
       });
   }
 }
@@ -12067,11 +12138,40 @@ function __c91(j: number): any {
           repo: S.String.pipe(T.Label()),
           per_page: S.optional(S.Number.pipe(T.Query())),
           page: S.optional(S.Number.pipe(T.Query())),
+        }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/tags", code: 200 })),
+      ).annotate({ identifier: "ListTagsRequest" });
+    case 1:
+      return S.suspend(() =>
+        S.Struct({
+          name: S.String,
+          commit: __S(3968, __c248, 0),
+          zipball_url: S.String,
+          tarball_url: S.String,
+          node_id: S.String,
+        }),
+      ).annotate({ identifier: "Tag" });
+    case 2:
+      return S.Array(__S(1457, __c91, 1));
+    case 3:
+      return S.suspend(() => __S(1458, __c91, 2).pipe(T.RawResponseRoot())).annotate({
+        identifier: "ListTagsResponse",
+      });
+  }
+}
+function __c92(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
+          per_page: S.optional(S.Number.pipe(T.Query())),
+          page: S.optional(S.Number.pipe(T.Query())),
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/teams", code: 200 })),
       ).annotate({ identifier: "ListTeamsRequest" });
   }
 }
-function __c92(j: number): any {
+function __c93(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12108,14 +12208,14 @@ function __c92(j: number): any {
         }),
       ).annotate({ identifier: "HookDeliveryItem" });
     case 2:
-      return S.Array(__S(1473, __c92, 1));
+      return S.Array(__S(1489, __c93, 1));
     case 3:
-      return S.suspend(() => __S(1474, __c92, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1490, __c93, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListWebhookDeliveriesResponse",
       });
   }
 }
-function __c93(j: number): any {
+function __c94(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12127,14 +12227,14 @@ function __c93(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/hooks", code: 200 })),
       ).annotate({ identifier: "ListWebhooksRequest" });
     case 1:
-      return S.Array(__S(2961, __c185, 1));
+      return S.Array(__S(2929, __c183, 1));
     case 2:
-      return S.suspend(() => __S(1489, __c93, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(1505, __c94, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "ListWebhooksResponse",
       });
   }
 }
-function __c94(j: number): any {
+function __c95(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12148,7 +12248,7 @@ function __c94(j: number): any {
       ).annotate({ identifier: "MergeRequest" });
   }
 }
-function __c95(j: number): any {
+function __c96(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12168,7 +12268,7 @@ function __c95(j: number): any {
       ).annotate({ identifier: "MergedUpstream" });
   }
 }
-function __c96(j: number): any {
+function __c97(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12182,7 +12282,7 @@ function __c96(j: number): any {
       ).annotate({ identifier: "PingWebhookRequest" });
   }
 }
-function __c97(j: number): any {
+function __c98(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12201,7 +12301,7 @@ function __c97(j: number): any {
       ).annotate({ identifier: "RedeliverWebhookDeliveryRequest" });
   }
 }
-function __c98(j: number): any {
+function __c99(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12209,7 +12309,7 @@ function __c98(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          apps: __S(3344, __c209, 0),
+          apps: __S(3312, __c207, 0),
         }).pipe(
           T.Http({
             method: "DELETE",
@@ -12220,7 +12320,7 @@ function __c98(j: number): any {
       ).annotate({ identifier: "RemoveAppAccessRestrictionsRequest" });
   }
 }
-function __c99(j: number): any {
+function __c100(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12238,7 +12338,28 @@ function __c99(j: number): any {
       ).annotate({ identifier: "RemoveCollaboratorRequest" });
   }
 }
-function __c100(j: number): any {
+function __c101(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
+          basehead: S.String.pipe(T.Label()),
+          page: S.optional(S.Number.pipe(T.Query())),
+          per_page: S.optional(S.Number.pipe(T.Query())),
+          accept: S.optional(S.String.pipe(T.Header("Accept"))),
+        }).pipe(
+          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/compare/{basehead}", code: 200 }),
+        ),
+      ).annotate({ identifier: "CompareCommitsRequest" });
+    case 1:
+      return S.suspend(() => S.Unknown.pipe(T.RawResponseRoot())).annotate({
+        identifier: "CompareCommitsResponse",
+      });
+  }
+}
+function __c102(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12257,144 +12378,7 @@ function __c100(j: number): any {
       ).annotate({ identifier: "RemoveStatusCheckContextsRequest" });
   }
 }
-function __c101(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-          basehead: S.String.pipe(T.Label()),
-          page: S.optional(S.Number.pipe(T.Query())),
-          per_page: S.optional(S.Number.pipe(T.Query())),
-        }).pipe(
-          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/compare/{basehead}", code: 200 }),
-        ),
-      ).annotate({ identifier: "CompareCommitsRequest" });
-    case 1:
-      return S.suspend(() =>
-        S.Struct({
-          url: S.String,
-          html_url: S.String,
-          permalink_url: S.String,
-          diff_url: S.String,
-          patch_url: S.String,
-          base_commit: __S(1672, __c104, 8),
-          merge_base_commit: __S(1672, __c104, 8),
-          status: S.String,
-          ahead_by: S.Number,
-          behind_by: S.Number,
-          total_commits: S.Number,
-          commits: __S(1632, __c102, 0),
-          files: S.optional(__S(1671, __c104, 7)),
-        }),
-      ).annotate({ identifier: "CommitComparison" });
-  }
-}
-function __c102(j: number): any {
-  switch (j) {
-    case 0:
-      return S.Array(__S(1672, __c104, 8));
-  }
-}
 function __c103(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          sha: S.String,
-          url: S.String,
-        }),
-      ).annotate({ identifier: "CommitCommitTree" });
-  }
-}
-function __c104(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          name: S.optional(S.String),
-          email: S.optional(S.String),
-          date: S.optional(S.String),
-        }),
-      ).annotate({ identifier: "NullableGitUser" });
-    case 1:
-      return S.suspend(() =>
-        S.Struct({
-          verified: S.Boolean,
-          reason: S.String,
-          payload: S.NullOr(S.String),
-          signature: S.NullOr(S.String),
-          verified_at: S.NullOr(S.String),
-        }),
-      ).annotate({ identifier: "Verification" });
-    case 2:
-      return S.suspend(() =>
-        S.Struct({
-          url: S.String,
-          author: S.NullOr(__S(1664, __c104, 0)),
-          committer: S.NullOr(__S(1664, __c104, 0)),
-          message: S.String,
-          comment_count: S.Number,
-          tree: __S(1648, __c103, 0),
-          verification: S.optional(__S(1665, __c104, 1)),
-        }),
-      ).annotate({ identifier: "CommitCommit" });
-    case 3:
-      return S.suspend(() =>
-        S.Struct({
-          sha: S.String,
-          url: S.String,
-          html_url: S.optional(S.String),
-        }),
-      ).annotate({ identifier: "CommitParentsItem" });
-    case 4:
-      return S.Array(__S(1667, __c104, 3));
-    case 5:
-      return S.suspend(() =>
-        S.Struct({
-          additions: S.optional(S.Number),
-          deletions: S.optional(S.Number),
-          total: S.optional(S.Number),
-        }),
-      ).annotate({ identifier: "CommitStats" });
-    case 6:
-      return S.suspend(() =>
-        S.Struct({
-          sha: S.NullOr(S.String),
-          filename: S.String,
-          status: S.String,
-          additions: S.Number,
-          deletions: S.Number,
-          changes: S.Number,
-          blob_url: S.String,
-          raw_url: S.String,
-          contents_url: S.String,
-          patch: S.optional(S.String),
-          previous_filename: S.optional(S.String),
-        }),
-      ).annotate({ identifier: "DiffEntry" });
-    case 7:
-      return S.Array(__S(1670, __c104, 6));
-    case 8:
-      return S.suspend(() =>
-        S.Struct({
-          url: S.String,
-          sha: S.String,
-          node_id: S.String,
-          html_url: S.String,
-          comments_url: S.String,
-          commit: __S(1666, __c104, 2),
-          author: S.NullOr(S.Unknown),
-          committer: S.NullOr(S.Unknown),
-          parents: __S(1668, __c104, 4),
-          stats: S.optional(__S(1669, __c104, 5)),
-          files: S.optional(__S(1671, __c104, 7)),
-        }),
-      ).annotate({ identifier: "Commit" });
-  }
-}
-function __c105(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12412,7 +12396,7 @@ function __c105(j: number): any {
       ).annotate({ identifier: "RemoveStatusCheckProtectionRequest" });
   }
 }
-function __c106(j: number): any {
+function __c104(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12431,7 +12415,7 @@ function __c106(j: number): any {
       ).annotate({ identifier: "RemoveTeamAccessRestrictionsRequest" });
   }
 }
-function __c107(j: number): any {
+function __c105(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12439,7 +12423,7 @@ function __c107(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          users: __S(3344, __c209, 0),
+          users: __S(3312, __c207, 0),
         }).pipe(
           T.Http({
             method: "DELETE",
@@ -12450,7 +12434,7 @@ function __c107(j: number): any {
       ).annotate({ identifier: "RemoveUserAccessRestrictionsRequest" });
   }
 }
-function __c108(j: number): any {
+function __c106(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12469,19 +12453,19 @@ function __c108(j: number): any {
       ).annotate({ identifier: "RenameBranchRequest" });
   }
 }
-function __c109(j: number): any {
+function __c107(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
-          names: __S(3344, __c209, 0),
+          names: __S(3312, __c207, 0),
         }).pipe(T.Http({ method: "PUT", uri: "/repos/{owner}/{repo}/topics", code: 200 })),
       ).annotate({ identifier: "ReplaceAllTopicsRequest" });
   }
 }
-function __c110(j: number): any {
+function __c108(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12499,7 +12483,7 @@ function __c110(j: number): any {
       ).annotate({ identifier: "PageBuildStatus" });
   }
 }
-function __c111(j: number): any {
+function __c109(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12517,7 +12501,7 @@ function __c111(j: number): any {
       ).annotate({ identifier: "SetAdminBranchProtectionRequest" });
   }
 }
-function __c112(j: number): any {
+function __c110(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12525,7 +12509,7 @@ function __c112(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          apps: __S(3344, __c209, 0),
+          apps: __S(3312, __c207, 0),
         }).pipe(
           T.Http({
             method: "PUT",
@@ -12536,7 +12520,7 @@ function __c112(j: number): any {
       ).annotate({ identifier: "SetAppAccessRestrictionsRequest" });
   }
 }
-function __c113(j: number): any {
+function __c111(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12553,6 +12537,36 @@ function __c113(j: number): any {
           }),
         ),
       ).annotate({ identifier: "SetStatusCheckContextsRequest" });
+  }
+}
+function __c112(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
+          bundle: __S(1808, __c113, 0),
+        }).pipe(T.Http({ method: "POST", uri: "/repos/{owner}/{repo}/attestations", code: 200 })),
+      ).annotate({ identifier: "CreateAttestationRequest" });
+    case 1:
+      return S.suspend(() =>
+        S.Struct({
+          id: S.optional(S.Number),
+        }),
+      ).annotate({ identifier: "CreateAttestationResponse" });
+  }
+}
+function __c113(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          mediaType: S.optional(S.String),
+          verificationMaterial: S.optional(__S(3568, __c223, 0)),
+          dsseEnvelope: S.optional(__S(3568, __c223, 0)),
+        }),
+      ).annotate({ identifier: "CreateAttestationRequestBundle" });
   }
 }
 function __c114(j: number): any {
@@ -12581,38 +12595,8 @@ function __c115(j: number): any {
         S.Struct({
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
-          bundle: __S(1856, __c116, 0),
-        }).pipe(T.Http({ method: "POST", uri: "/repos/{owner}/{repo}/attestations", code: 200 })),
-      ).annotate({ identifier: "CreateAttestationRequest" });
-    case 1:
-      return S.suspend(() =>
-        S.Struct({
-          id: S.optional(S.Number),
-        }),
-      ).annotate({ identifier: "CreateAttestationResponse" });
-  }
-}
-function __c116(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          mediaType: S.optional(S.String),
-          verificationMaterial: S.optional(__S(3600, __c225, 0)),
-          dsseEnvelope: S.optional(__S(3600, __c225, 0)),
-        }),
-      ).annotate({ identifier: "CreateAttestationRequestBundle" });
-  }
-}
-function __c117(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          users: __S(3344, __c209, 0),
+          users: __S(3312, __c207, 0),
         }).pipe(
           T.Http({
             method: "PUT",
@@ -12623,7 +12607,7 @@ function __c117(j: number): any {
       ).annotate({ identifier: "SetUserAccessRestrictionsRequest" });
   }
 }
-function __c118(j: number): any {
+function __c116(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12637,7 +12621,7 @@ function __c118(j: number): any {
       ).annotate({ identifier: "TestPushWebhookRequest" });
   }
 }
-function __c119(j: number): any {
+function __c117(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12646,12 +12630,12 @@ function __c119(j: number): any {
           repo: S.String.pipe(T.Label()),
           new_owner: S.String,
           new_name: S.optional(S.String),
-          team_ids: S.optional(__S(4224, __c264, 0)),
+          team_ids: S.optional(__S(4240, __c265, 0)),
         }).pipe(T.Http({ method: "POST", uri: "/repos/{owner}/{repo}/transfer", code: 200 })),
       ).annotate({ identifier: "TransferRequest" });
   }
 }
-function __c120(j: number): any {
+function __c118(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12662,15 +12646,15 @@ function __c120(j: number): any {
     case 1:
       return S.suspend(() =>
         S.Struct({
-          advanced_security: S.optional(__S(1920, __c120, 0)),
-          code_security: S.optional(__S(1920, __c120, 0)),
-          secret_scanning: S.optional(__S(1920, __c120, 0)),
-          secret_scanning_push_protection: S.optional(__S(1920, __c120, 0)),
-          secret_scanning_ai_detection: S.optional(__S(1920, __c120, 0)),
-          secret_scanning_non_provider_patterns: S.optional(__S(1920, __c120, 0)),
-          secret_scanning_delegated_alert_dismissal: S.optional(__S(1920, __c120, 0)),
-          secret_scanning_delegated_bypass: S.optional(__S(1920, __c120, 0)),
-          secret_scanning_delegated_bypass_options: S.optional(__S(3634, __c227, 2)),
+          advanced_security: S.optional(__S(1888, __c118, 0)),
+          code_security: S.optional(__S(1888, __c118, 0)),
+          secret_scanning: S.optional(__S(1888, __c118, 0)),
+          secret_scanning_push_protection: S.optional(__S(1888, __c118, 0)),
+          secret_scanning_ai_detection: S.optional(__S(1888, __c118, 0)),
+          secret_scanning_non_provider_patterns: S.optional(__S(1888, __c118, 0)),
+          secret_scanning_delegated_alert_dismissal: S.optional(__S(1888, __c118, 0)),
+          secret_scanning_delegated_bypass: S.optional(__S(1888, __c118, 0)),
+          secret_scanning_delegated_bypass_options: S.optional(__S(3602, __c225, 2)),
         }),
       ).annotate({ identifier: "UpdateRequestSecurityAndAnalysis" });
     case 2:
@@ -12683,7 +12667,7 @@ function __c120(j: number): any {
           homepage: S.optional(S.String),
           private: S.optional(S.Boolean),
           visibility: S.optional(S.String),
-          security_and_analysis: S.optional(S.NullOr(__S(1921, __c120, 1))),
+          security_and_analysis: S.optional(S.NullOr(__S(1889, __c118, 1))),
           has_issues: S.optional(S.Boolean),
           has_projects: S.optional(S.Boolean),
           has_wiki: S.optional(S.Boolean),
@@ -12705,37 +12689,38 @@ function __c120(j: number): any {
           archived: S.optional(S.Boolean),
           allow_forking: S.optional(S.Boolean),
           web_commit_signoff_required: S.optional(S.Boolean),
+          has_discussions: S.optional(S.Boolean),
         }).pipe(T.Http({ method: "PATCH", uri: "/repos/{owner}/{repo}", code: 200 })),
       ).annotate({ identifier: "UpdateRequest" });
   }
 }
-function __c121(j: number): any {
+function __c119(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
           strict: S.Boolean,
-          contexts: __S(3344, __c209, 0),
-          checks: S.optional(__S(1969, __c123, 1)),
+          contexts: S.optional(__S(3312, __c207, 0)),
+          checks: S.optional(__S(1937, __c121, 1)),
         }),
       ).annotate({ identifier: "UpdateBranchProtectionRequestRequiredStatusChecks" });
     case 1:
       return S.suspend(() =>
         S.Struct({
-          dismissal_restrictions: S.optional(__S(1952, __c122, 0)),
+          dismissal_restrictions: S.optional(__S(1920, __c120, 0)),
           dismiss_stale_reviews: S.optional(S.Boolean),
           require_code_owner_reviews: S.optional(S.Boolean),
           required_approving_review_count: S.optional(S.Number),
           require_last_push_approval: S.optional(S.Boolean),
-          bypass_pull_request_allowances: S.optional(__S(1952, __c122, 0)),
+          bypass_pull_request_allowances: S.optional(__S(1920, __c120, 0)),
         }),
       ).annotate({ identifier: "UpdateBranchProtectionRequestRequiredPullRequestReviews" });
     case 2:
       return S.suspend(() =>
         S.Struct({
-          users: __S(3344, __c209, 0),
-          teams: __S(3344, __c209, 0),
-          apps: S.optional(__S(3344, __c209, 0)),
+          users: __S(3312, __c207, 0),
+          teams: __S(3312, __c207, 0),
+          apps: S.optional(__S(3312, __c207, 0)),
         }),
       ).annotate({ identifier: "UpdateBranchProtectionRequestRestrictions" });
     case 3:
@@ -12744,10 +12729,10 @@ function __c121(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          required_status_checks: S.NullOr(__S(1936, __c121, 0)),
+          required_status_checks: S.NullOr(__S(1904, __c119, 0)),
           enforce_admins: S.NullOr(S.Boolean),
-          required_pull_request_reviews: S.NullOr(__S(1937, __c121, 1)),
-          restrictions: S.NullOr(__S(1938, __c121, 2)),
+          required_pull_request_reviews: S.NullOr(__S(1905, __c119, 1)),
+          restrictions: S.NullOr(__S(1906, __c119, 2)),
           required_linear_history: S.optional(S.Boolean),
           allow_force_pushes: S.optional(S.NullOr(S.Boolean)),
           allow_deletions: S.optional(S.Boolean),
@@ -12770,16 +12755,16 @@ function __c121(j: number): any {
           users_url: S.String,
           teams_url: S.String,
           users: __S(32, __c2, 0),
-          teams: __S(4179, __c261, 3),
-          apps: S.optional(__S(3377, __c211, 1)),
+          teams: __S(4163, __c260, 3),
+          apps: S.optional(__S(3345, __c209, 1)),
         }),
       ).annotate({ identifier: "ProtectedBranchRequiredPullRequestReviewsDismissalRestrictions" });
     case 5:
       return S.suspend(() =>
         S.Struct({
           users: __S(32, __c2, 0),
-          teams: __S(4179, __c261, 3),
-          apps: S.optional(__S(3377, __c211, 1)),
+          teams: __S(4163, __c260, 3),
+          apps: S.optional(__S(3345, __c209, 1)),
         }),
       ).annotate({
         identifier: "ProtectedBranchRequiredPullRequestReviewsBypassPullRequestAllowances",
@@ -12792,22 +12777,22 @@ function __c121(j: number): any {
           require_code_owner_reviews: S.optional(S.Boolean),
           required_approving_review_count: S.optional(S.Number),
           require_last_push_approval: S.optional(S.Boolean),
-          dismissal_restrictions: S.optional(__S(1940, __c121, 4)),
-          bypass_pull_request_allowances: S.optional(__S(1941, __c121, 5)),
+          dismissal_restrictions: S.optional(__S(1908, __c119, 4)),
+          bypass_pull_request_allowances: S.optional(__S(1909, __c119, 5)),
         }),
       ).annotate({ identifier: "ProtectedBranchRequiredPullRequestReviews" });
     case 7:
       return S.suspend(() =>
         S.Struct({
           url: S.String,
-          required_status_checks: S.optional(__S(704, __c44, 0)),
-          required_pull_request_reviews: S.optional(__S(1942, __c121, 6)),
-          required_signatures: S.optional(__S(2288, __c143, 0)),
-          enforce_admins: S.optional(__S(2288, __c143, 0)),
+          required_status_checks: S.optional(__S(720, __c45, 0)),
+          required_pull_request_reviews: S.optional(__S(1910, __c119, 6)),
+          required_signatures: S.optional(__S(2256, __c141, 0)),
+          enforce_admins: S.optional(__S(2256, __c141, 0)),
           required_linear_history: S.optional(__S(1056, __c66, 0)),
           allow_force_pushes: S.optional(__S(1056, __c66, 0)),
           allow_deletions: S.optional(__S(1056, __c66, 0)),
-          restrictions: S.optional(__S(3814, __c238, 6)),
+          restrictions: S.optional(__S(3782, __c236, 6)),
           required_conversation_resolution: S.optional(__S(4064, __c254, 0)),
           block_creations: S.optional(__S(1056, __c66, 0)),
           lock_branch: S.optional(__S(4064, __c254, 0)),
@@ -12816,21 +12801,21 @@ function __c121(j: number): any {
       ).annotate({ identifier: "ProtectedBranch" });
   }
 }
-function __c122(j: number): any {
+function __c120(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
-          users: S.optional(__S(3344, __c209, 0)),
-          teams: S.optional(__S(3344, __c209, 0)),
-          apps: S.optional(__S(3344, __c209, 0)),
+          users: S.optional(__S(3312, __c207, 0)),
+          teams: S.optional(__S(3312, __c207, 0)),
+          apps: S.optional(__S(3312, __c207, 0)),
         }),
       ).annotate({
         identifier: "UpdateBranchProtectionRequestRequiredPullRequestReviewsDismissalRestrictions",
       });
   }
 }
-function __c123(j: number): any {
+function __c121(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12840,10 +12825,10 @@ function __c123(j: number): any {
         }),
       ).annotate({ identifier: "UpdateBranchProtectionRequestRequiredStatusChecksChecksItem" });
     case 1:
-      return S.Array(__S(1968, __c123, 0));
+      return S.Array(__S(1936, __c121, 0));
   }
 }
-function __c124(j: number): any {
+function __c122(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12862,7 +12847,7 @@ function __c124(j: number): any {
       ).annotate({ identifier: "UpdateCommitCommentRequest" });
   }
 }
-function __c125(j: number): any {
+function __c123(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12882,7 +12867,7 @@ function __c125(j: number): any {
       ).annotate({ identifier: "UpdateDeploymentBranchPolicyRequest" });
   }
 }
-function __c126(j: number): any {
+function __c124(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12897,7 +12882,7 @@ function __c126(j: number): any {
       ).annotate({ identifier: "UpdateInformationAboutPagesSiteRequest" });
   }
 }
-function __c127(j: number): any {
+function __c125(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12916,24 +12901,7 @@ function __c127(j: number): any {
       ).annotate({ identifier: "UpdateInvitationRequest" });
   }
 }
-function __c128(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          org: S.String.pipe(T.Label()),
-          ruleset_id: S.Number.pipe(T.Label()),
-          name: S.optional(S.String),
-          target: S.optional(S.String),
-          enforcement: S.optional(S.String),
-          bypass_actors: S.optional(__S(2689, __c168, 1)),
-          conditions: S.optional(S.Unknown),
-          rules: S.optional(__S(2672, __c167, 0)),
-        }).pipe(T.Http({ method: "PUT", uri: "/orgs/{org}/rulesets/{ruleset_id}", code: 200 })),
-      ).annotate({ identifier: "UpdateOrgRulesetRequest" });
-  }
-}
-function __c129(j: number): any {
+function __c126(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12947,7 +12915,7 @@ function __c129(j: number): any {
       ).annotate({ identifier: "CreateAutolinkRequest" });
   }
 }
-function __c130(j: number): any {
+function __c127(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12961,7 +12929,24 @@ function __c130(j: number): any {
       ).annotate({ identifier: "Autolink" });
   }
 }
-function __c131(j: number): any {
+function __c128(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          org: S.String.pipe(T.Label()),
+          ruleset_id: S.Number.pipe(T.Label()),
+          name: S.optional(S.String),
+          target: S.optional(S.String),
+          enforcement: S.optional(S.String),
+          bypass_actors: S.optional(__S(2657, __c166, 1)),
+          conditions: S.optional(S.Unknown),
+          rules: S.optional(__S(2640, __c165, 0)),
+        }).pipe(T.Http({ method: "PUT", uri: "/orgs/{org}/rulesets/{ruleset_id}", code: 200 })),
+      ).annotate({ identifier: "UpdateOrgRulesetRequest" });
+  }
+}
+function __c129(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -12969,12 +12954,12 @@ function __c131(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          dismissal_restrictions: S.optional(__S(1952, __c122, 0)),
+          dismissal_restrictions: S.optional(__S(1920, __c120, 0)),
           dismiss_stale_reviews: S.optional(S.Boolean),
           require_code_owner_reviews: S.optional(S.Boolean),
           required_approving_review_count: S.optional(S.Number),
           require_last_push_approval: S.optional(S.Boolean),
-          bypass_pull_request_allowances: S.optional(__S(1952, __c122, 0)),
+          bypass_pull_request_allowances: S.optional(__S(1920, __c120, 0)),
         }).pipe(
           T.Http({
             method: "PATCH",
@@ -12985,7 +12970,7 @@ function __c131(j: number): any {
       ).annotate({ identifier: "UpdatePullRequestReviewProtectionRequest" });
   }
 }
-function __c132(j: number): any {
+function __c130(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13011,7 +12996,7 @@ function __c132(j: number): any {
       ).annotate({ identifier: "UpdateReleaseRequest" });
   }
 }
-function __c133(j: number): any {
+function __c131(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13032,7 +13017,7 @@ function __c133(j: number): any {
       ).annotate({ identifier: "UpdateReleaseAssetRequest" });
   }
 }
-function __c134(j: number): any {
+function __c132(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13043,16 +13028,16 @@ function __c134(j: number): any {
           name: S.optional(S.String),
           target: S.optional(S.String),
           enforcement: S.optional(S.String),
-          bypass_actors: S.optional(__S(2689, __c168, 1)),
-          conditions: S.optional(__S(2897, __c181, 1)),
-          rules: S.optional(__S(2692, __c168, 4)),
+          bypass_actors: S.optional(__S(2657, __c166, 1)),
+          conditions: S.optional(__S(2865, __c179, 1)),
+          rules: S.optional(__S(2660, __c166, 4)),
         }).pipe(
           T.Http({ method: "PUT", uri: "/repos/{owner}/{repo}/rulesets/{ruleset_id}", code: 200 }),
         ),
       ).annotate({ identifier: "UpdateRepoRulesetRequest" });
   }
 }
-function __c135(j: number): any {
+function __c133(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13061,8 +13046,8 @@ function __c135(j: number): any {
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
           strict: S.optional(S.Boolean),
-          contexts: S.optional(__S(3344, __c209, 0)),
-          checks: S.optional(__S(1969, __c123, 1)),
+          contexts: S.optional(__S(3312, __c207, 0)),
+          checks: S.optional(__S(1937, __c121, 1)),
         }).pipe(
           T.Http({
             method: "PATCH",
@@ -13073,7 +13058,7 @@ function __c135(j: number): any {
       ).annotate({ identifier: "UpdateStatusCheckProtectionRequest" });
   }
 }
-function __c136(j: number): any {
+function __c134(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13081,10 +13066,10 @@ function __c136(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           hook_id: S.Number.pipe(T.Label()),
-          config: S.optional(__S(2944, __c184, 0)),
-          events: S.optional(__S(3344, __c209, 0)),
-          add_events: S.optional(__S(3344, __c209, 0)),
-          remove_events: S.optional(__S(3344, __c209, 0)),
+          config: S.optional(__S(2912, __c182, 0)),
+          events: S.optional(__S(3312, __c207, 0)),
+          add_events: S.optional(__S(3312, __c207, 0)),
+          remove_events: S.optional(__S(3312, __c207, 0)),
           active: S.optional(S.Boolean),
         }).pipe(
           T.Http({ method: "PATCH", uri: "/repos/{owner}/{repo}/hooks/{hook_id}", code: 200 }),
@@ -13092,7 +13077,7 @@ function __c136(j: number): any {
       ).annotate({ identifier: "UpdateWebhookRequest" });
   }
 }
-function __c137(j: number): any {
+function __c135(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13114,7 +13099,7 @@ function __c137(j: number): any {
       ).annotate({ identifier: "UpdateWebhookConfigForRepoRequest" });
   }
 }
-function __c138(j: number): any {
+function __c136(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13134,7 +13119,7 @@ function __c138(j: number): any {
       ).annotate({ identifier: "UploadReleaseAssetRequest" });
   }
 }
-function __c139(j: number): any {
+function __c137(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13156,7 +13141,7 @@ function __c139(j: number): any {
       ).annotate({ identifier: "CreateCommitCommentRequest" });
   }
 }
-function __c140(j: number): any {
+function __c138(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13175,7 +13160,7 @@ function __c140(j: number): any {
       ).annotate({ identifier: "ReactionRollup" });
   }
 }
-function __c141(j: number): any {
+function __c139(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13189,16 +13174,16 @@ function __c141(j: number): any {
           position: S.NullOr(S.Number),
           line: S.NullOr(S.Number),
           commit_id: S.String,
-          user: S.NullOr(__S(3568, __c223, 0)),
+          user: S.NullOr(__S(3536, __c221, 0)),
           created_at: S.String,
           updated_at: S.String,
           author_association: S.String,
-          reactions: S.optional(__S(2240, __c140, 0)),
+          reactions: S.optional(__S(2208, __c138, 0)),
         }),
       ).annotate({ identifier: "CommitComment" });
   }
 }
-function __c142(j: number): any {
+function __c140(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13216,7 +13201,7 @@ function __c142(j: number): any {
       ).annotate({ identifier: "CreateCommitSignatureProtectionRequest" });
   }
 }
-function __c143(j: number): any {
+function __c141(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13227,7 +13212,7 @@ function __c143(j: number): any {
       ).annotate({ identifier: "ProtectedBranchAdminEnforced" });
   }
 }
-function __c144(j: number): any {
+function __c142(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13243,7 +13228,7 @@ function __c144(j: number): any {
       ).annotate({ identifier: "CreateCommitStatusRequest" });
   }
 }
-function __c145(j: number): any {
+function __c143(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13258,12 +13243,12 @@ function __c145(j: number): any {
           context: S.String,
           created_at: S.String,
           updated_at: S.String,
-          creator: S.NullOr(__S(3568, __c223, 0)),
+          creator: S.NullOr(__S(3536, __c221, 0)),
         }),
       ).annotate({ identifier: "Status" });
   }
 }
-function __c146(j: number): any {
+function __c144(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13277,7 +13262,7 @@ function __c146(j: number): any {
       ).annotate({ identifier: "CreateDeployKeyRequest" });
   }
 }
-function __c147(j: number): any {
+function __c145(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13296,7 +13281,7 @@ function __c147(j: number): any {
       ).annotate({ identifier: "DeployKey" });
   }
 }
-function __c148(j: number): any {
+function __c146(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13306,7 +13291,7 @@ function __c148(j: number): any {
           ref: S.String,
           task: S.optional(S.String),
           auto_merge: S.optional(S.Boolean),
-          required_contexts: S.optional(__S(3344, __c209, 0)),
+          required_contexts: S.optional(__S(3312, __c207, 0)),
           payload: S.optional(S.Unknown),
           environment: S.optional(S.String),
           description: S.optional(S.NullOr(S.String)),
@@ -13316,7 +13301,7 @@ function __c148(j: number): any {
       ).annotate({ identifier: "CreateDeploymentRequest" });
   }
 }
-function __c149(j: number): any {
+function __c147(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13331,19 +13316,19 @@ function __c149(j: number): any {
           original_environment: S.optional(S.String),
           environment: S.String,
           description: S.NullOr(S.String),
-          creator: S.NullOr(__S(3568, __c223, 0)),
+          creator: S.NullOr(__S(3536, __c221, 0)),
           created_at: S.String,
           updated_at: S.String,
           statuses_url: S.String,
           repository_url: S.String,
           transient_environment: S.optional(S.Boolean),
           production_environment: S.optional(S.Boolean),
-          performed_via_github_app: S.optional(S.NullOr(__S(2400, __c150, 0))),
+          performed_via_github_app: S.optional(S.NullOr(__S(2368, __c148, 0))),
         }),
       ).annotate({ identifier: "Deployment" });
   }
 }
-function __c150(j: number): any {
+function __c148(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13359,14 +13344,14 @@ function __c150(j: number): any {
           html_url: S.String,
           created_at: S.String,
           updated_at: S.String,
-          permissions: __S(3328, __c208, 0),
-          events: __S(3344, __c209, 0),
+          permissions: __S(3296, __c206, 0),
+          events: __S(3312, __c207, 0),
           installations_count: S.optional(S.Number),
         }),
       ).annotate({ identifier: "NullableIntegration" });
   }
 }
-function __c151(j: number): any {
+function __c149(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13386,7 +13371,7 @@ function __c151(j: number): any {
       ).annotate({ identifier: "CreateDeploymentBranchPolicyRequest" });
   }
 }
-function __c152(j: number): any {
+function __c150(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13399,7 +13384,7 @@ function __c152(j: number): any {
       ).annotate({ identifier: "DeploymentBranchPolicy" });
   }
 }
-function __c153(j: number): any {
+function __c151(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13418,7 +13403,7 @@ function __c153(j: number): any {
       ).annotate({ identifier: "CreateDeploymentProtectionRuleRequest" });
   }
 }
-function __c154(j: number): any {
+function __c152(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13426,12 +13411,12 @@ function __c154(j: number): any {
           id: S.Number,
           node_id: S.String,
           enabled: S.Boolean,
-          app: __S(2480, __c155, 0),
+          app: __S(2448, __c153, 0),
         }),
       ).annotate({ identifier: "DeploymentProtectionRule" });
   }
 }
-function __c155(j: number): any {
+function __c153(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13444,7 +13429,7 @@ function __c155(j: number): any {
       ).annotate({ identifier: "CustomDeploymentRuleApp" });
   }
 }
-function __c156(j: number): any {
+function __c154(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13469,7 +13454,7 @@ function __c156(j: number): any {
       ).annotate({ identifier: "CreateDeploymentStatusRequest" });
   }
 }
-function __c157(j: number): any {
+function __c155(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13478,7 +13463,7 @@ function __c157(j: number): any {
           id: S.Number,
           node_id: S.String,
           state: S.String,
-          creator: S.NullOr(__S(3568, __c223, 0)),
+          creator: S.NullOr(__S(3536, __c221, 0)),
           description: S.String,
           environment: S.optional(S.String),
           target_url: S.String,
@@ -13488,12 +13473,12 @@ function __c157(j: number): any {
           repository_url: S.String,
           environment_url: S.optional(S.String),
           log_url: S.optional(S.String),
-          performed_via_github_app: S.optional(S.NullOr(__S(2400, __c150, 0))),
+          performed_via_github_app: S.optional(S.NullOr(__S(2368, __c148, 0))),
         }),
       ).annotate({ identifier: "DeploymentStatus" });
   }
 }
-function __c158(j: number): any {
+function __c156(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13501,12 +13486,12 @@ function __c158(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           event_type: S.String,
-          client_payload: S.optional(__S(3600, __c225, 0)),
+          client_payload: S.optional(__S(3568, __c223, 0)),
         }).pipe(T.Http({ method: "POST", uri: "/repos/{owner}/{repo}/dispatches", code: 200 })),
       ).annotate({ identifier: "CreateDispatchEventRequest" });
   }
 }
-function __c159(j: number): any {
+function __c157(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13538,7 +13523,7 @@ function __c159(j: number): any {
       ).annotate({ identifier: "CreateForAuthenticatedUserRequest" });
   }
 }
-function __c160(j: number): any {
+function __c158(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13564,10 +13549,10 @@ function __c160(j: number): any {
           node_id: S.String,
           name: S.String,
           full_name: S.String,
-          license: S.NullOr(__S(2592, __c162, 0)),
+          license: S.NullOr(__S(2560, __c160, 0)),
           forks: S.Number,
-          permissions: S.optional(__S(2560, __c160, 0)),
-          owner: __S(3568, __c223, 0),
+          permissions: S.optional(__S(2528, __c158, 0)),
+          owner: __S(3536, __c221, 0),
           private: S.Boolean,
           html_url: S.String,
           description: S.NullOr(S.String),
@@ -13623,7 +13608,7 @@ function __c160(j: number): any {
           default_branch: S.String,
           open_issues_count: S.Number,
           is_template: S.optional(S.Boolean),
-          topics: S.optional(__S(3344, __c209, 0)),
+          topics: S.optional(__S(3312, __c207, 0)),
           has_issues: S.Boolean,
           has_projects: S.Boolean,
           has_wiki: S.Boolean,
@@ -13657,12 +13642,12 @@ function __c160(j: number): any {
           master_branch: S.optional(S.String),
           starred_at: S.optional(S.String),
           anonymous_access_enabled: S.optional(S.Boolean),
-          code_search_index_status: S.optional(__S(2561, __c160, 1)),
+          code_search_index_status: S.optional(__S(2529, __c158, 1)),
         }),
       ).annotate({ identifier: "NullableRepository" });
   }
 }
-function __c161(j: number): any {
+function __c159(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13681,7 +13666,7 @@ function __c161(j: number): any {
           node_id: S.String,
           name: S.String,
           full_name: S.String,
-          owner: __S(3568, __c223, 0),
+          owner: __S(3536, __c221, 0),
           private: S.Boolean,
           html_url: S.String,
           description: S.NullOr(S.String),
@@ -13737,7 +13722,7 @@ function __c161(j: number): any {
           default_branch: S.String,
           open_issues_count: S.Number,
           is_template: S.optional(S.Boolean),
-          topics: S.optional(__S(3344, __c209, 0)),
+          topics: S.optional(__S(3312, __c207, 0)),
           has_issues: S.Boolean,
           has_projects: S.Boolean,
           has_wiki: S.Boolean,
@@ -13752,9 +13737,9 @@ function __c161(j: number): any {
           pushed_at: S.String,
           created_at: S.String,
           updated_at: S.String,
-          permissions: S.optional(__S(2576, __c161, 0)),
+          permissions: S.optional(__S(2544, __c159, 0)),
           allow_rebase_merge: S.optional(S.Boolean),
-          template_repository: S.optional(S.NullOr(__S(2562, __c160, 2))),
+          template_repository: S.optional(S.NullOr(__S(2530, __c158, 2))),
           temp_clone_token: S.optional(S.NullOr(S.String)),
           allow_squash_merge: S.optional(S.Boolean),
           allow_auto_merge: S.optional(S.Boolean),
@@ -13770,23 +13755,23 @@ function __c161(j: number): any {
           web_commit_signoff_required: S.optional(S.Boolean),
           subscribers_count: S.Number,
           network_count: S.Number,
-          license: S.NullOr(__S(2592, __c162, 0)),
-          organization: S.optional(S.NullOr(__S(3568, __c223, 0))),
-          parent: S.optional(__S(2562, __c160, 2)),
-          source: S.optional(__S(2562, __c160, 2)),
+          license: S.NullOr(__S(2560, __c160, 0)),
+          organization: S.optional(S.NullOr(__S(3536, __c221, 0))),
+          parent: S.optional(__S(2530, __c158, 2)),
+          source: S.optional(__S(2530, __c158, 2)),
           forks: S.Number,
           master_branch: S.optional(S.String),
           open_issues: S.Number,
           watchers: S.Number,
           anonymous_access_enabled: S.optional(S.Boolean),
-          code_of_conduct: S.optional(__S(2608, __c163, 0)),
-          security_and_analysis: S.optional(S.NullOr(__S(3635, __c227, 3))),
-          custom_properties: S.optional(__S(3600, __c225, 0)),
+          code_of_conduct: S.optional(__S(2576, __c161, 0)),
+          security_and_analysis: S.optional(S.NullOr(__S(3603, __c225, 3))),
+          custom_properties: S.optional(__S(3568, __c223, 0)),
         }),
       ).annotate({ identifier: "FullRepository" });
   }
 }
-function __c162(j: number): any {
+function __c160(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13801,7 +13786,7 @@ function __c162(j: number): any {
       ).annotate({ identifier: "NullableLicenseSimple" });
   }
 }
-function __c163(j: number): any {
+function __c161(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13814,7 +13799,7 @@ function __c163(j: number): any {
       ).annotate({ identifier: "CodeOfConductSimple" });
   }
 }
-function __c164(j: number): any {
+function __c162(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13828,7 +13813,7 @@ function __c164(j: number): any {
       ).annotate({ identifier: "CreateForkRequest" });
   }
 }
-function __c165(j: number): any {
+function __c163(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13858,12 +13843,12 @@ function __c165(j: number): any {
           squash_merge_commit_message: S.optional(S.String),
           merge_commit_title: S.optional(S.String),
           merge_commit_message: S.optional(S.String),
-          custom_properties: S.optional(__S(3600, __c225, 0)),
+          custom_properties: S.optional(__S(3568, __c223, 0)),
         }).pipe(T.Http({ method: "POST", uri: "/orgs/{org}/repos", code: 200 })),
       ).annotate({ identifier: "CreateInOrgRequest" });
   }
 }
-function __c166(j: number): any {
+function __c164(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13872,20 +13857,20 @@ function __c166(j: number): any {
           name: S.String,
           target: S.optional(S.String),
           enforcement: S.String,
-          bypass_actors: S.optional(__S(2689, __c168, 1)),
+          bypass_actors: S.optional(__S(2657, __c166, 1)),
           conditions: S.optional(S.Unknown),
-          rules: S.optional(__S(2672, __c167, 0)),
+          rules: S.optional(__S(2640, __c165, 0)),
         }).pipe(T.Http({ method: "POST", uri: "/orgs/{org}/rulesets", code: 200 })),
       ).annotate({ identifier: "CreateOrgRulesetRequest" });
   }
 }
-function __c167(j: number): any {
+function __c165(j: number): any {
   switch (j) {
     case 0:
       return S.Array(S.Unknown);
   }
 }
-function __c168(j: number): any {
+function __c166(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13896,7 +13881,7 @@ function __c168(j: number): any {
         }),
       ).annotate({ identifier: "RepositoryRulesetBypassActor" });
     case 1:
-      return S.Array(__S(2688, __c168, 0));
+      return S.Array(__S(2656, __c166, 0));
     case 2:
       return S.suspend(() =>
         S.Struct({
@@ -13906,8 +13891,8 @@ function __c168(j: number): any {
     case 3:
       return S.suspend(() =>
         S.Struct({
-          self: S.optional(__S(2690, __c168, 2)),
-          html: S.optional(S.NullOr(__S(2690, __c168, 2))),
+          self: S.optional(__S(2658, __c166, 2)),
+          html: S.optional(S.NullOr(__S(2658, __c166, 2))),
         }),
       ).annotate({ identifier: "RepositoryRulesetLinks" });
     case 4:
@@ -13921,19 +13906,19 @@ function __c168(j: number): any {
           source_type: S.optional(S.String),
           source: S.String,
           enforcement: S.String,
-          bypass_actors: S.optional(__S(2689, __c168, 1)),
+          bypass_actors: S.optional(__S(2657, __c166, 1)),
           current_user_can_bypass: S.optional(S.String),
           node_id: S.optional(S.String),
-          _links: S.optional(__S(2691, __c168, 3)),
+          _links: S.optional(__S(2659, __c166, 3)),
           conditions: S.optional(S.NullOr(S.Unknown)),
-          rules: S.optional(__S(2692, __c168, 4)),
+          rules: S.optional(__S(2660, __c166, 4)),
           created_at: S.optional(S.String),
           updated_at: S.optional(S.String),
         }),
       ).annotate({ identifier: "RepositoryRuleset" });
   }
 }
-function __c169(j: number): any {
+function __c167(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13943,7 +13928,7 @@ function __c169(j: number): any {
         }),
       ).annotate({ identifier: "CreateOrUpdateEnvironmentRequestReviewersItem" });
     case 1:
-      return S.Array(__S(2704, __c169, 0));
+      return S.Array(__S(2672, __c167, 0));
     case 2:
       return S.suspend(() =>
         S.Struct({
@@ -13952,8 +13937,8 @@ function __c169(j: number): any {
           environment_name: S.String.pipe(T.Label()),
           wait_timer: S.optional(S.Number),
           prevent_self_review: S.optional(S.Boolean),
-          reviewers: S.optional(S.NullOr(__S(2705, __c169, 1))),
-          deployment_branch_policy: S.optional(S.NullOr(__S(2720, __c170, 0))),
+          reviewers: S.optional(S.NullOr(__S(2673, __c167, 1))),
+          deployment_branch_policy: S.optional(S.NullOr(__S(2688, __c168, 0))),
         }).pipe(
           T.Http({
             method: "PUT",
@@ -13964,7 +13949,7 @@ function __c169(j: number): any {
       ).annotate({ identifier: "CreateOrUpdateEnvironmentRequest" });
   }
 }
-function __c170(j: number): any {
+function __c168(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -13985,13 +13970,13 @@ function __c170(j: number): any {
           html_url: S.String,
           created_at: S.String,
           updated_at: S.String,
-          protection_rules: S.optional(__S(2721, __c170, 1)),
-          deployment_branch_policy: S.optional(S.NullOr(__S(2720, __c170, 0))),
+          protection_rules: S.optional(__S(2689, __c168, 1)),
+          deployment_branch_policy: S.optional(S.NullOr(__S(2688, __c168, 0))),
         }),
       ).annotate({ identifier: "Environment" });
   }
 }
-function __c171(j: number): any {
+function __c169(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14011,13 +13996,13 @@ function __c171(j: number): any {
           content: S.String,
           sha: S.optional(S.String),
           branch: S.optional(S.String),
-          committer: S.optional(__S(2736, __c171, 0)),
-          author: S.optional(__S(2736, __c171, 0)),
+          committer: S.optional(__S(2704, __c169, 0)),
+          author: S.optional(__S(2704, __c169, 0)),
         }).pipe(T.Http({ method: "PUT", uri: "/repos/{owner}/{repo}/contents/{path}", code: 200 })),
       ).annotate({ identifier: "CreateOrUpdateFileContentsRequest" });
   }
 }
-function __c172(j: number): any {
+function __c170(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14039,7 +14024,7 @@ function __c172(j: number): any {
           git_url: S.optional(S.String),
           download_url: S.optional(S.String),
           type: S.optional(S.String),
-          _links: S.optional(__S(2752, __c172, 0)),
+          _links: S.optional(__S(2720, __c170, 0)),
         }),
       ).annotate({ identifier: "FileCommitContent" });
     case 2:
@@ -14066,7 +14051,7 @@ function __c172(j: number): any {
         }),
       ).annotate({ identifier: "FileCommitCommitParentsItem" });
     case 5:
-      return S.Array(__S(2756, __c172, 4));
+      return S.Array(__S(2724, __c170, 4));
     case 6:
       return S.suspend(() =>
         S.Struct({
@@ -14084,24 +14069,24 @@ function __c172(j: number): any {
           node_id: S.optional(S.String),
           url: S.optional(S.String),
           html_url: S.optional(S.String),
-          author: S.optional(__S(2754, __c172, 2)),
-          committer: S.optional(__S(2754, __c172, 2)),
+          author: S.optional(__S(2722, __c170, 2)),
+          committer: S.optional(__S(2722, __c170, 2)),
           message: S.optional(S.String),
-          tree: S.optional(__S(2755, __c172, 3)),
-          parents: S.optional(__S(2757, __c172, 5)),
-          verification: S.optional(__S(2758, __c172, 6)),
+          tree: S.optional(__S(2723, __c170, 3)),
+          parents: S.optional(__S(2725, __c170, 5)),
+          verification: S.optional(__S(2726, __c170, 6)),
         }),
       ).annotate({ identifier: "FileCommitCommit" });
     case 8:
       return S.suspend(() =>
         S.Struct({
-          content: S.NullOr(__S(2753, __c172, 1)),
-          commit: __S(2759, __c172, 7),
+          content: S.NullOr(__S(2721, __c170, 1)),
+          commit: __S(2727, __c170, 7),
         }),
       ).annotate({ identifier: "FileCommit" });
   }
 }
-function __c173(j: number): any {
+function __c171(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14128,7 +14113,7 @@ function __c173(j: number): any {
       ).annotate({ identifier: "PageDeployment" });
   }
 }
-function __c174(j: number): any {
+function __c172(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14143,12 +14128,12 @@ function __c174(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           build_type: S.optional(S.String),
-          source: S.optional(__S(2784, __c174, 0)),
+          source: S.optional(__S(2752, __c172, 0)),
         }).pipe(T.Http({ method: "POST", uri: "/repos/{owner}/{repo}/pages", code: 200 })),
       ).annotate({ identifier: "CreatePagesSiteRequest" });
   }
 }
-function __c175(j: number): any {
+function __c173(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14162,7 +14147,7 @@ function __c175(j: number): any {
         S.Struct({
           state: S.String,
           description: S.String,
-          domains: __S(3344, __c209, 0),
+          domains: __S(3312, __c207, 0),
           expires_at: S.optional(S.String),
         }),
       ).annotate({ identifier: "PagesHttpsCertificate" });
@@ -14177,15 +14162,15 @@ function __c175(j: number): any {
           custom_404: S.Boolean,
           html_url: S.optional(S.String),
           build_type: S.optional(S.NullOr(S.String)),
-          source: S.optional(__S(2800, __c175, 0)),
+          source: S.optional(__S(2768, __c173, 0)),
           public: S.Boolean,
-          https_certificate: S.optional(__S(2801, __c175, 1)),
+          https_certificate: S.optional(__S(2769, __c173, 1)),
           https_enforced: S.optional(S.Boolean),
         }),
       ).annotate({ identifier: "Page" });
   }
 }
-function __c176(j: number): any {
+function __c174(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14205,7 +14190,7 @@ function __c176(j: number): any {
       ).annotate({ identifier: "CreateReleaseRequest" });
   }
 }
-function __c177(j: number): any {
+function __c175(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14223,18 +14208,18 @@ function __c177(j: number): any {
           download_count: S.Number,
           created_at: S.String,
           updated_at: S.String,
-          uploader: S.NullOr(__S(3568, __c223, 0)),
+          uploader: S.NullOr(__S(3536, __c221, 0)),
         }),
       ).annotate({ identifier: "ReleaseAsset" });
   }
 }
-function __c178(j: number): any {
+function __c176(j: number): any {
   switch (j) {
     case 0:
-      return S.Array(__S(2832, __c177, 0));
+      return S.Array(__S(2800, __c175, 0));
   }
 }
-function __c179(j: number): any {
+function __c177(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14257,18 +14242,18 @@ function __c179(j: number): any {
           created_at: S.String,
           published_at: S.NullOr(S.String),
           updated_at: S.optional(S.NullOr(S.String)),
-          author: __S(3568, __c223, 0),
-          assets: __S(2848, __c178, 0),
+          author: __S(3536, __c221, 0),
+          assets: __S(2816, __c176, 0),
           body_html: S.optional(S.String),
           body_text: S.optional(S.String),
           mentions_count: S.optional(S.Number),
           discussion_url: S.optional(S.String),
-          reactions: S.optional(__S(2240, __c140, 0)),
+          reactions: S.optional(__S(2208, __c138, 0)),
         }),
       ).annotate({ identifier: "Release" });
   }
 }
-function __c180(j: number): any {
+function __c178(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14278,31 +14263,31 @@ function __c180(j: number): any {
           name: S.String,
           target: S.optional(S.String),
           enforcement: S.String,
-          bypass_actors: S.optional(__S(2689, __c168, 1)),
-          conditions: S.optional(__S(2897, __c181, 1)),
-          rules: S.optional(__S(2692, __c168, 4)),
+          bypass_actors: S.optional(__S(2657, __c166, 1)),
+          conditions: S.optional(__S(2865, __c179, 1)),
+          rules: S.optional(__S(2660, __c166, 4)),
         }).pipe(T.Http({ method: "POST", uri: "/repos/{owner}/{repo}/rulesets", code: 200 })),
       ).annotate({ identifier: "CreateRepoRulesetRequest" });
   }
 }
-function __c181(j: number): any {
+function __c179(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
-          include: S.optional(__S(3344, __c209, 0)),
-          exclude: S.optional(__S(3344, __c209, 0)),
+          include: S.optional(__S(3312, __c207, 0)),
+          exclude: S.optional(__S(3312, __c207, 0)),
         }),
       ).annotate({ identifier: "OrgRulesetConditionsCase0RefName" });
     case 1:
       return S.suspend(() =>
         S.Struct({
-          ref_name: S.optional(__S(2896, __c181, 0)),
+          ref_name: S.optional(__S(2864, __c179, 0)),
         }),
       ).annotate({ identifier: "RepositoryRulesetConditions" });
   }
 }
-function __c182(j: number): any {
+function __c180(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14324,7 +14309,7 @@ function __c182(j: number): any {
       ).annotate({ identifier: "CreateUsingTemplateRequest" });
   }
 }
-function __c183(j: number): any {
+function __c181(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14332,14 +14317,14 @@ function __c183(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           name: S.optional(S.String),
-          config: S.optional(__S(2944, __c184, 0)),
-          events: S.optional(__S(3344, __c209, 0)),
+          config: S.optional(__S(2912, __c182, 0)),
+          events: S.optional(__S(3312, __c207, 0)),
           active: S.optional(S.Boolean),
         }).pipe(T.Http({ method: "POST", uri: "/repos/{owner}/{repo}/hooks", code: 200 })),
       ).annotate({ identifier: "CreateWebhookRequest" });
   }
 }
-function __c184(j: number): any {
+function __c182(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14352,7 +14337,7 @@ function __c184(j: number): any {
       ).annotate({ identifier: "CreateWebhookRequestConfig" });
   }
 }
-function __c185(j: number): any {
+function __c183(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14369,34 +14354,34 @@ function __c185(j: number): any {
           id: S.Number,
           name: S.String,
           active: S.Boolean,
-          events: __S(3344, __c209, 0),
-          config: __S(2944, __c184, 0),
+          events: __S(3312, __c207, 0),
+          config: __S(2912, __c182, 0),
           updated_at: S.String,
           created_at: S.String,
           url: S.String,
           test_url: S.String,
           ping_url: S.String,
           deliveries_url: S.optional(S.String),
-          last_response: __S(2960, __c185, 0),
+          last_response: __S(2928, __c183, 0),
         }),
       ).annotate({ identifier: "Hook" });
   }
 }
-function __c186(j: number): any {
+function __c184(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
-          properties: __S(2993, __c187, 1),
+          properties: __S(2961, __c185, 1),
         }).pipe(
           T.Http({ method: "PATCH", uri: "/repos/{owner}/{repo}/properties/values", code: 200 }),
         ),
       ).annotate({ identifier: "CustomPropertiesForReposCreateOrUpdateRepositoryValuesRequest" });
   }
 }
-function __c187(j: number): any {
+function __c185(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14406,10 +14391,10 @@ function __c187(j: number): any {
         }),
       ).annotate({ identifier: "CustomPropertyValue" });
     case 1:
-      return S.Array(__S(2992, __c187, 0));
+      return S.Array(__S(2960, __c185, 0));
   }
 }
-function __c188(j: number): any {
+function __c186(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14421,12 +14406,12 @@ function __c188(j: number): any {
         ),
       ).annotate({ identifier: "CustomPropertiesForReposGetRepositoryValuesRequest" });
     case 1:
-      return S.suspend(() => __S(2993, __c187, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(2961, __c185, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "CustomPropertiesForReposGetRepositoryValuesResponse",
       });
   }
 }
-function __c189(j: number): any {
+function __c187(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14442,7 +14427,7 @@ function __c189(j: number): any {
       ).annotate({ identifier: "DeclineInvitationForAuthenticatedUserRequest" });
   }
 }
-function __c190(j: number): any {
+function __c188(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14453,7 +14438,7 @@ function __c190(j: number): any {
       ).annotate({ identifier: "DeleteRequest" });
   }
 }
-function __c191(j: number): any {
+function __c189(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14471,7 +14456,7 @@ function __c191(j: number): any {
       ).annotate({ identifier: "DeleteAccessRestrictionsRequest" });
   }
 }
-function __c192(j: number): any {
+function __c190(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14489,7 +14474,7 @@ function __c192(j: number): any {
       ).annotate({ identifier: "DeleteAdminBranchProtectionRequest" });
   }
 }
-function __c193(j: number): any {
+function __c191(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14507,7 +14492,7 @@ function __c193(j: number): any {
       ).annotate({ identifier: "DeleteAnEnvironmentRequest" });
   }
 }
-function __c194(j: number): any {
+function __c192(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14525,7 +14510,7 @@ function __c194(j: number): any {
       ).annotate({ identifier: "DeleteAutolinkRequest" });
   }
 }
-function __c195(j: number): any {
+function __c193(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14541,7 +14526,7 @@ function __c195(j: number): any {
       ).annotate({ identifier: "AcceptInvitationForAuthenticatedUserRequest" });
   }
 }
-function __c196(j: number): any {
+function __c194(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() => S.Struct({})).annotate({
@@ -14549,7 +14534,7 @@ function __c196(j: number): any {
       });
   }
 }
-function __c197(j: number): any {
+function __c195(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14567,7 +14552,7 @@ function __c197(j: number): any {
       ).annotate({ identifier: "DeleteBranchProtectionRequest" });
   }
 }
-function __c198(j: number): any {
+function __c196(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14585,7 +14570,7 @@ function __c198(j: number): any {
       ).annotate({ identifier: "DeleteCommitCommentRequest" });
   }
 }
-function __c199(j: number): any {
+function __c197(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14603,7 +14588,7 @@ function __c199(j: number): any {
       ).annotate({ identifier: "DeleteCommitSignatureProtectionRequest" });
   }
 }
-function __c200(j: number): any {
+function __c198(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14617,7 +14602,7 @@ function __c200(j: number): any {
       ).annotate({ identifier: "DeleteDeployKeyRequest" });
   }
 }
-function __c201(j: number): any {
+function __c199(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14635,7 +14620,7 @@ function __c201(j: number): any {
       ).annotate({ identifier: "DeleteDeploymentRequest" });
   }
 }
-function __c202(j: number): any {
+function __c200(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14654,7 +14639,7 @@ function __c202(j: number): any {
       ).annotate({ identifier: "DeleteDeploymentBranchPolicyRequest" });
   }
 }
-function __c203(j: number): any {
+function __c201(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14672,15 +14657,15 @@ function __c203(j: number): any {
           message: S.String,
           sha: S.String,
           branch: S.optional(S.String),
-          committer: S.optional(__S(3248, __c203, 0)),
-          author: S.optional(__S(3248, __c203, 0)),
+          committer: S.optional(__S(3216, __c201, 0)),
+          author: S.optional(__S(3216, __c201, 0)),
         }).pipe(
           T.Http({ method: "DELETE", uri: "/repos/{owner}/{repo}/contents/{path}", code: 200 }),
         ),
       ).annotate({ identifier: "DeleteFileRequest" });
   }
 }
-function __c204(j: number): any {
+function __c202(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14698,7 +14683,7 @@ function __c204(j: number): any {
       ).annotate({ identifier: "DeleteInvitationRequest" });
   }
 }
-function __c205(j: number): any {
+function __c203(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14709,7 +14694,7 @@ function __c205(j: number): any {
       ).annotate({ identifier: "DeleteOrgRulesetRequest" });
   }
 }
-function __c206(j: number): any {
+function __c204(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14720,7 +14705,7 @@ function __c206(j: number): any {
       ).annotate({ identifier: "DeletePagesSiteRequest" });
   }
 }
-function __c207(j: number): any {
+function __c205(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14728,7 +14713,7 @@ function __c207(j: number): any {
           owner: S.String.pipe(T.Label()),
           repo: S.String.pipe(T.Label()),
           branch: S.String.pipe(T.Label()),
-          apps: __S(3344, __c209, 0),
+          apps: __S(3312, __c207, 0),
         }).pipe(
           T.Http({
             method: "POST",
@@ -14739,35 +14724,38 @@ function __c207(j: number): any {
       ).annotate({ identifier: "AddAppAccessRestrictionsRequest" });
   }
 }
-function __c208(j: number): any {
+function __c206(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
-        S.Struct({
-          issues: S.optional(S.String),
-          checks: S.optional(S.String),
-          metadata: S.optional(S.String),
-          contents: S.optional(S.String),
-          deployments: S.optional(S.String),
-        }),
+        S.StructWithRest(
+          S.Struct({
+            issues: S.optional(S.String),
+            checks: S.optional(S.String),
+            metadata: S.optional(S.String),
+            contents: S.optional(S.String),
+            deployments: S.optional(S.String),
+          }),
+          [S.Record(S.String, S.Unknown)],
+        ),
       ).annotate({ identifier: "IntegrationPermissions" });
   }
 }
-function __c209(j: number): any {
+function __c207(j: number): any {
   switch (j) {
     case 0:
       return S.Array(S.String);
   }
 }
-function __c210(j: number): any {
+function __c208(j: number): any {
   switch (j) {
     case 0:
-      return S.suspend(() => __S(3377, __c211, 1).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(3345, __c209, 1).pipe(T.RawResponseRoot())).annotate({
         identifier: "AddAppAccessRestrictionsResponse",
       });
   }
 }
-function __c211(j: number): any {
+function __c209(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14783,16 +14771,16 @@ function __c211(j: number): any {
           html_url: S.String,
           created_at: S.String,
           updated_at: S.String,
-          permissions: __S(3328, __c208, 0),
-          events: __S(3344, __c209, 0),
+          permissions: __S(3296, __c206, 0),
+          events: __S(3312, __c207, 0),
           installations_count: S.optional(S.Number),
         }),
       ).annotate({ identifier: "Integration" });
     case 1:
-      return S.Array(/*@__PURE__*/ S.NullOr(__S(3376, __c211, 0)));
+      return S.Array(/*@__PURE__*/ S.NullOr(__S(3344, __c209, 0)));
   }
 }
-function __c212(j: number): any {
+function __c210(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14810,7 +14798,7 @@ function __c212(j: number): any {
       ).annotate({ identifier: "DeletePullRequestReviewProtectionRequest" });
   }
 }
-function __c213(j: number): any {
+function __c211(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14828,7 +14816,7 @@ function __c213(j: number): any {
       ).annotate({ identifier: "DeleteReleaseRequest" });
   }
 }
-function __c214(j: number): any {
+function __c212(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14846,7 +14834,7 @@ function __c214(j: number): any {
       ).annotate({ identifier: "DeleteReleaseAssetRequest" });
   }
 }
-function __c215(j: number): any {
+function __c213(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14864,7 +14852,7 @@ function __c215(j: number): any {
       ).annotate({ identifier: "DeleteRepoRulesetRequest" });
   }
 }
-function __c216(j: number): any {
+function __c214(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14878,7 +14866,7 @@ function __c216(j: number): any {
       ).annotate({ identifier: "DeleteWebhookRequest" });
   }
 }
-function __c217(j: number): any {
+function __c215(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14895,7 +14883,7 @@ function __c217(j: number): any {
       ).annotate({ identifier: "DisableAutomatedSecurityFixesRequest" });
   }
 }
-function __c218(j: number): any {
+function __c216(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14914,7 +14902,7 @@ function __c218(j: number): any {
       ).annotate({ identifier: "DisableDeploymentProtectionRuleRequest" });
   }
 }
-function __c219(j: number): any {
+function __c217(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14927,7 +14915,7 @@ function __c219(j: number): any {
       ).annotate({ identifier: "DisableImmutableReleasesRequest" });
   }
 }
-function __c220(j: number): any {
+function __c218(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14944,7 +14932,7 @@ function __c220(j: number): any {
       ).annotate({ identifier: "DisablePrivateVulnerabilityReportingRequest" });
   }
 }
-function __c221(j: number): any {
+function __c219(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14961,7 +14949,7 @@ function __c221(j: number): any {
       ).annotate({ identifier: "DisableVulnerabilityAlertsRequest" });
   }
 }
-function __c222(j: number): any {
+function __c220(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -14980,7 +14968,7 @@ function __c222(j: number): any {
       ).annotate({ identifier: "AddCollaboratorRequest" });
   }
 }
-function __c223(j: number): any {
+function __c221(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15011,15 +14999,15 @@ function __c223(j: number): any {
       ).annotate({ identifier: "SimpleUser" });
   }
 }
-function __c224(j: number): any {
+function __c222(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
           id: S.Number,
-          repository: __S(3651, __c228, 3),
-          invitee: S.NullOr(__S(3568, __c223, 0)),
-          inviter: S.NullOr(__S(3568, __c223, 0)),
+          repository: __S(3619, __c226, 3),
+          invitee: S.NullOr(__S(3536, __c221, 0)),
+          inviter: S.NullOr(__S(3536, __c221, 0)),
           permissions: S.String,
           created_at: S.String,
           expired: S.optional(S.Boolean),
@@ -15030,13 +15018,13 @@ function __c224(j: number): any {
       ).annotate({ identifier: "RepositoryInvitation" });
   }
 }
-function __c225(j: number): any {
+function __c223(j: number): any {
   switch (j) {
     case 0:
       return S.Record(S.String, S.Unknown);
   }
 }
-function __c226(j: number): any {
+function __c224(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15046,7 +15034,7 @@ function __c226(j: number): any {
       ).annotate({ identifier: "SecurityAndAnalysisAdvancedSecurity" });
   }
 }
-function __c227(j: number): any {
+function __c225(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15059,31 +15047,31 @@ function __c227(j: number): any {
         identifier: "SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem",
       });
     case 1:
-      return S.Array(__S(3632, __c227, 0));
+      return S.Array(__S(3600, __c225, 0));
     case 2:
       return S.suspend(() =>
         S.Struct({
-          reviewers: S.optional(__S(3633, __c227, 1)),
+          reviewers: S.optional(__S(3601, __c225, 1)),
         }),
       ).annotate({ identifier: "SecurityAndAnalysisSecretScanningDelegatedBypassOptions" });
     case 3:
       return S.suspend(() =>
         S.Struct({
-          advanced_security: S.optional(__S(3616, __c226, 0)),
-          code_security: S.optional(__S(3616, __c226, 0)),
-          dependabot_security_updates: S.optional(__S(3616, __c226, 0)),
-          secret_scanning: S.optional(__S(3616, __c226, 0)),
-          secret_scanning_push_protection: S.optional(__S(3616, __c226, 0)),
-          secret_scanning_non_provider_patterns: S.optional(__S(3616, __c226, 0)),
-          secret_scanning_ai_detection: S.optional(__S(3616, __c226, 0)),
-          secret_scanning_delegated_alert_dismissal: S.optional(__S(3616, __c226, 0)),
-          secret_scanning_delegated_bypass: S.optional(__S(3616, __c226, 0)),
-          secret_scanning_delegated_bypass_options: S.optional(__S(3634, __c227, 2)),
+          advanced_security: S.optional(__S(3584, __c224, 0)),
+          code_security: S.optional(__S(3584, __c224, 0)),
+          dependabot_security_updates: S.optional(__S(3584, __c224, 0)),
+          secret_scanning: S.optional(__S(3584, __c224, 0)),
+          secret_scanning_push_protection: S.optional(__S(3584, __c224, 0)),
+          secret_scanning_non_provider_patterns: S.optional(__S(3584, __c224, 0)),
+          secret_scanning_ai_detection: S.optional(__S(3584, __c224, 0)),
+          secret_scanning_delegated_alert_dismissal: S.optional(__S(3584, __c224, 0)),
+          secret_scanning_delegated_bypass: S.optional(__S(3584, __c224, 0)),
+          secret_scanning_delegated_bypass_options: S.optional(__S(3602, __c225, 2)),
         }),
       ).annotate({ identifier: "SecurityAndAnalysis" });
   }
 }
-function __c228(j: number): any {
+function __c226(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15122,7 +15110,7 @@ function __c228(j: number): any {
           node_id: S.String,
           name: S.String,
           full_name: S.String,
-          owner: __S(3568, __c223, 0),
+          owner: __S(3536, __c221, 0),
           private: S.Boolean,
           html_url: S.String,
           description: S.NullOr(S.String),
@@ -15178,7 +15166,7 @@ function __c228(j: number): any {
           default_branch: S.optional(S.String),
           open_issues_count: S.optional(S.Number),
           is_template: S.optional(S.Boolean),
-          topics: S.optional(__S(3344, __c209, 0)),
+          topics: S.optional(__S(3312, __c207, 0)),
           has_issues: S.optional(S.Boolean),
           has_projects: S.optional(S.Boolean),
           has_wiki: S.optional(S.Boolean),
@@ -15193,26 +15181,26 @@ function __c228(j: number): any {
           pushed_at: S.optional(S.NullOr(S.String)),
           created_at: S.optional(S.NullOr(S.String)),
           updated_at: S.optional(S.NullOr(S.String)),
-          permissions: S.optional(__S(3648, __c228, 0)),
+          permissions: S.optional(__S(3616, __c226, 0)),
           role_name: S.optional(S.String),
           temp_clone_token: S.optional(S.String),
           delete_branch_on_merge: S.optional(S.Boolean),
           subscribers_count: S.optional(S.Number),
           network_count: S.optional(S.Number),
-          code_of_conduct: S.optional(__S(3649, __c228, 1)),
-          license: S.optional(S.NullOr(__S(3650, __c228, 2))),
+          code_of_conduct: S.optional(__S(3617, __c226, 1)),
+          license: S.optional(S.NullOr(__S(3618, __c226, 2))),
           forks: S.optional(S.Number),
           open_issues: S.optional(S.Number),
           watchers: S.optional(S.Number),
           allow_forking: S.optional(S.Boolean),
           web_commit_signoff_required: S.optional(S.Boolean),
-          security_and_analysis: S.optional(S.NullOr(__S(3635, __c227, 3))),
-          custom_properties: S.optional(__S(3600, __c225, 0)),
+          security_and_analysis: S.optional(S.NullOr(__S(3603, __c225, 3))),
+          custom_properties: S.optional(__S(3568, __c223, 0)),
         }),
       ).annotate({ identifier: "MinimalRepository" });
   }
 }
-function __c229(j: number): any {
+function __c227(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15224,7 +15212,7 @@ function __c229(j: number): any {
       ).annotate({ identifier: "DownloadTarballArchiveRequest" });
   }
 }
-function __c230(j: number): any {
+function __c228(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15236,7 +15224,7 @@ function __c230(j: number): any {
       ).annotate({ identifier: "DownloadZipballArchiveRequest" });
   }
 }
-function __c231(j: number): any {
+function __c229(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15253,7 +15241,7 @@ function __c231(j: number): any {
       ).annotate({ identifier: "EnableAutomatedSecurityFixesRequest" });
   }
 }
-function __c232(j: number): any {
+function __c230(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15266,7 +15254,7 @@ function __c232(j: number): any {
       ).annotate({ identifier: "EnableImmutableReleasesRequest" });
   }
 }
-function __c233(j: number): any {
+function __c231(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15283,7 +15271,7 @@ function __c233(j: number): any {
       ).annotate({ identifier: "EnablePrivateVulnerabilityReportingRequest" });
   }
 }
-function __c234(j: number): any {
+function __c232(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15296,7 +15284,7 @@ function __c234(j: number): any {
       ).annotate({ identifier: "EnableVulnerabilityAlertsRequest" });
   }
 }
-function __c235(j: number): any {
+function __c233(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15324,7 +15312,7 @@ function __c235(j: number): any {
       ).annotate({ identifier: "ReleaseNotesContent" });
   }
 }
-function __c236(j: number): any {
+function __c234(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15335,7 +15323,7 @@ function __c236(j: number): any {
       ).annotate({ identifier: "GetRequest" });
   }
 }
-function __c237(j: number): any {
+function __c235(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15353,7 +15341,7 @@ function __c237(j: number): any {
       ).annotate({ identifier: "GetAccessRestrictionsRequest" });
   }
 }
-function __c238(j: number): any {
+function __c236(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15380,7 +15368,7 @@ function __c238(j: number): any {
         }),
       ).annotate({ identifier: "BranchRestrictionPolicyUsersItem" });
     case 1:
-      return S.Array(__S(3808, __c238, 0));
+      return S.Array(__S(3776, __c236, 0));
     case 2:
       return S.suspend(() =>
         S.Struct({
@@ -15425,7 +15413,7 @@ function __c238(j: number): any {
           id: S.optional(S.Number),
           slug: S.optional(S.String),
           node_id: S.optional(S.String),
-          owner: S.optional(__S(3810, __c238, 2)),
+          owner: S.optional(__S(3778, __c236, 2)),
           name: S.optional(S.String),
           client_id: S.optional(S.String),
           description: S.optional(S.String),
@@ -15433,12 +15421,12 @@ function __c238(j: number): any {
           html_url: S.optional(S.String),
           created_at: S.optional(S.String),
           updated_at: S.optional(S.String),
-          permissions: S.optional(__S(3811, __c238, 3)),
-          events: S.optional(__S(3344, __c209, 0)),
+          permissions: S.optional(__S(3779, __c236, 3)),
+          events: S.optional(__S(3312, __c207, 0)),
         }),
       ).annotate({ identifier: "BranchRestrictionPolicyAppsItem" });
     case 5:
-      return S.Array(__S(3812, __c238, 4));
+      return S.Array(__S(3780, __c236, 4));
     case 6:
       return S.suspend(() =>
         S.Struct({
@@ -15446,14 +15434,14 @@ function __c238(j: number): any {
           users_url: S.String,
           teams_url: S.String,
           apps_url: S.String,
-          users: __S(3809, __c238, 1),
-          teams: __S(4179, __c261, 3),
-          apps: __S(3813, __c238, 5),
+          users: __S(3777, __c236, 1),
+          teams: __S(4163, __c260, 3),
+          apps: __S(3781, __c236, 5),
         }),
       ).annotate({ identifier: "BranchRestrictionPolicy" });
   }
 }
-function __c239(j: number): any {
+function __c237(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15471,7 +15459,7 @@ function __c239(j: number): any {
       ).annotate({ identifier: "GetAdminBranchProtectionRequest" });
   }
 }
-function __c240(j: number): any {
+function __c238(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15490,15 +15478,15 @@ function __c240(j: number): any {
       ).annotate({ identifier: "AddStatusCheckContextsRequest" });
   }
 }
-function __c241(j: number): any {
+function __c239(j: number): any {
   switch (j) {
     case 0:
-      return S.suspend(() => __S(3344, __c209, 0).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(3312, __c207, 0).pipe(T.RawResponseRoot())).annotate({
         identifier: "AddStatusCheckContextsResponse",
       });
   }
 }
-function __c242(j: number): any {
+function __c240(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15515,17 +15503,17 @@ function __c242(j: number): any {
         ),
       ).annotate({ identifier: "GetAllDeploymentProtectionRulesRequest" });
     case 1:
-      return S.Array(__S(2464, __c154, 0));
+      return S.Array(__S(2432, __c152, 0));
     case 2:
       return S.suspend(() =>
         S.Struct({
           total_count: S.optional(S.Number),
-          custom_deployment_protection_rules: S.optional(__S(3873, __c242, 1)),
+          custom_deployment_protection_rules: S.optional(__S(3841, __c240, 1)),
         }),
       ).annotate({ identifier: "GetAllDeploymentProtectionRulesResponse" });
   }
 }
-function __c243(j: number): any {
+function __c241(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15537,17 +15525,17 @@ function __c243(j: number): any {
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/environments", code: 200 })),
       ).annotate({ identifier: "GetAllEnvironmentsRequest" });
     case 1:
-      return S.Array(__S(2722, __c170, 2));
+      return S.Array(__S(2690, __c168, 2));
     case 2:
       return S.suspend(() =>
         S.Struct({
           total_count: S.optional(S.Number),
-          environments: S.optional(__S(3889, __c243, 1)),
+          environments: S.optional(__S(3857, __c241, 1)),
         }),
       ).annotate({ identifier: "GetAllEnvironmentsResponse" });
   }
 }
-function __c244(j: number): any {
+function __c242(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15565,7 +15553,7 @@ function __c244(j: number): any {
       ).annotate({ identifier: "GetAllStatusCheckContextsRequest" });
   }
 }
-function __c245(j: number): any {
+function __c243(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15578,17 +15566,17 @@ function __c245(j: number): any {
       ).annotate({ identifier: "GetAllTopicsRequest" });
   }
 }
-function __c246(j: number): any {
+function __c244(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
         S.Struct({
-          names: __S(3344, __c209, 0),
+          names: __S(3312, __c207, 0),
         }),
       ).annotate({ identifier: "Topic" });
   }
 }
-function __c247(j: number): any {
+function __c245(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15606,7 +15594,7 @@ function __c247(j: number): any {
       ).annotate({ identifier: "GetAppsWithAccessToProtectedBranchRequest" });
   }
 }
-function __c248(j: number): any {
+function __c246(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15624,7 +15612,7 @@ function __c248(j: number): any {
       ).annotate({ identifier: "GetAutolinkRequest" });
   }
 }
-function __c249(j: number): any {
+function __c247(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15636,6 +15624,103 @@ function __c249(j: number): any {
           T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/branches/{branch}", code: 200 }),
         ),
       ).annotate({ identifier: "GetBranchRequest" });
+  }
+}
+function __c248(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          sha: S.String,
+          url: S.String,
+        }),
+      ).annotate({ identifier: "CommitCommitTree" });
+  }
+}
+function __c249(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          name: S.optional(S.String),
+          email: S.optional(S.String),
+          date: S.optional(S.String),
+        }),
+      ).annotate({ identifier: "NullableGitUser" });
+    case 1:
+      return S.suspend(() =>
+        S.Struct({
+          verified: S.Boolean,
+          reason: S.String,
+          payload: S.NullOr(S.String),
+          signature: S.NullOr(S.String),
+          verified_at: S.NullOr(S.String),
+        }),
+      ).annotate({ identifier: "Verification" });
+    case 2:
+      return S.suspend(() =>
+        S.Struct({
+          url: S.String,
+          author: S.NullOr(__S(3984, __c249, 0)),
+          committer: S.NullOr(__S(3984, __c249, 0)),
+          message: S.String,
+          comment_count: S.Number,
+          tree: __S(3968, __c248, 0),
+          verification: S.optional(__S(3985, __c249, 1)),
+        }),
+      ).annotate({ identifier: "CommitCommit" });
+    case 3:
+      return S.suspend(() =>
+        S.Struct({
+          sha: S.String,
+          url: S.String,
+          html_url: S.optional(S.String),
+        }),
+      ).annotate({ identifier: "CommitParentsItem" });
+    case 4:
+      return S.Array(__S(3987, __c249, 3));
+    case 5:
+      return S.suspend(() =>
+        S.Struct({
+          additions: S.optional(S.Number),
+          deletions: S.optional(S.Number),
+          total: S.optional(S.Number),
+        }),
+      ).annotate({ identifier: "CommitStats" });
+    case 6:
+      return S.suspend(() =>
+        S.Struct({
+          sha: S.NullOr(S.String),
+          filename: S.String,
+          status: S.String,
+          additions: S.Number,
+          deletions: S.Number,
+          changes: S.Number,
+          blob_url: S.String,
+          raw_url: S.String,
+          contents_url: S.String,
+          patch: S.optional(S.String),
+          previous_filename: S.optional(S.String),
+        }),
+      ).annotate({ identifier: "DiffEntry" });
+    case 7:
+      return S.Array(__S(3990, __c249, 6));
+    case 8:
+      return S.suspend(() =>
+        S.Struct({
+          url: S.String,
+          sha: S.String,
+          node_id: S.String,
+          html_url: S.String,
+          comments_url: S.String,
+          commit: __S(3986, __c249, 2),
+          author: S.NullOr(S.Unknown),
+          committer: S.NullOr(S.Unknown),
+          parents: __S(3988, __c249, 4),
+          stats: S.optional(__S(3989, __c249, 5)),
+          files: S.optional(__S(3991, __c249, 7)),
+        }),
+      ).annotate({ identifier: "Commit" });
   }
 }
 function __c250(j: number): any {
@@ -15651,7 +15736,7 @@ function __c250(j: number): any {
       return S.suspend(() =>
         S.Struct({
           name: S.String,
-          commit: __S(1672, __c104, 8),
+          commit: __S(3992, __c249, 8),
           _links: __S(4000, __c250, 0),
           protected: S.Boolean,
           protection: __S(4049, __c253, 1),
@@ -15668,8 +15753,8 @@ function __c251(j: number): any {
       return S.suspend(() =>
         S.Struct({
           users: S.optional(__S(32, __c2, 0)),
-          teams: S.optional(__S(4179, __c261, 3)),
-          apps: S.optional(__S(3377, __c211, 1)),
+          teams: S.optional(__S(4163, __c260, 3)),
+          apps: S.optional(__S(3345, __c209, 1)),
           url: S.optional(S.String),
           users_url: S.optional(S.String),
           teams_url: S.optional(S.String),
@@ -15679,8 +15764,8 @@ function __c251(j: number): any {
       return S.suspend(() =>
         S.Struct({
           users: S.optional(__S(32, __c2, 0)),
-          teams: S.optional(__S(4179, __c261, 3)),
-          apps: S.optional(__S(3377, __c211, 1)),
+          teams: S.optional(__S(4163, __c260, 3)),
+          apps: S.optional(__S(3345, __c209, 1)),
         }),
       ).annotate({ identifier: "ProtectedBranchPullRequestReviewBypassPullRequestAllowances" });
     case 2:
@@ -15717,7 +15802,7 @@ function __c253(j: number): any {
         S.Struct({
           url: S.optional(S.String),
           enforcement_level: S.optional(S.String),
-          contexts: __S(3344, __c209, 0),
+          contexts: __S(3312, __c207, 0),
           checks: __S(4033, __c252, 1),
           contexts_url: S.optional(S.String),
           strict: S.optional(S.Boolean),
@@ -15729,9 +15814,9 @@ function __c253(j: number): any {
           url: S.optional(S.String),
           enabled: S.optional(S.Boolean),
           required_status_checks: S.optional(__S(4048, __c253, 0)),
-          enforce_admins: S.optional(__S(2288, __c143, 0)),
+          enforce_admins: S.optional(__S(2256, __c141, 0)),
           required_pull_request_reviews: S.optional(__S(4018, __c251, 2)),
-          restrictions: S.optional(__S(3814, __c238, 6)),
+          restrictions: S.optional(__S(3782, __c236, 6)),
           required_linear_history: S.optional(__S(4064, __c254, 0)),
           allow_force_pushes: S.optional(__S(4064, __c254, 0)),
           allow_deletions: S.optional(__S(4064, __c254, 0)),
@@ -15739,7 +15824,7 @@ function __c253(j: number): any {
           required_conversation_resolution: S.optional(__S(4064, __c254, 0)),
           name: S.optional(S.String),
           protection_url: S.optional(S.String),
-          required_signatures: S.optional(__S(2288, __c143, 0)),
+          required_signatures: S.optional(__S(2256, __c141, 0)),
           lock_branch: S.optional(__S(4064, __c254, 0)),
           allow_fork_syncing: S.optional(__S(4064, __c254, 0)),
         }),
@@ -15805,36 +15890,12 @@ function __c257(j: number): any {
     case 0:
       return S.suspend(() =>
         S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-          per: S.optional(S.String.pipe(T.Query())),
-        }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/traffic/clones", code: 200 })),
-      ).annotate({ identifier: "GetClonesRequest" });
-    case 1:
-      return S.suspend(() =>
-        S.Struct({
-          count: S.Number,
-          uniques: S.Number,
-          clones: __S(4129, __c258, 1),
-        }),
-      ).annotate({ identifier: "CloneTraffic" });
+          id: S.Number.pipe(T.Label()),
+        }).pipe(T.Http({ method: "GET", uri: "/repositories/{id}", code: 200 })),
+      ).annotate({ identifier: "GetByIdRequest" });
   }
 }
 function __c258(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          timestamp: S.String,
-          uniques: S.Number,
-          count: S.Number,
-        }),
-      ).annotate({ identifier: "Traffic" });
-    case 1:
-      return S.Array(__S(4128, __c258, 0));
-  }
-}
-function __c259(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15853,15 +15914,15 @@ function __c259(j: number): any {
       ).annotate({ identifier: "AddTeamAccessRestrictionsRequest" });
   }
 }
-function __c260(j: number): any {
+function __c259(j: number): any {
   switch (j) {
     case 0:
-      return S.suspend(() => __S(4179, __c261, 3).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(4163, __c260, 3).pipe(T.RawResponseRoot())).annotate({
         identifier: "AddTeamAccessRestrictionsResponse",
       });
   }
 }
-function __c261(j: number): any {
+function __c260(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15905,7 +15966,7 @@ function __c261(j: number): any {
           privacy: S.optional(S.String),
           notification_setting: S.optional(S.String),
           permission: S.String,
-          permissions: S.optional(__S(4176, __c261, 0)),
+          permissions: S.optional(__S(4160, __c260, 0)),
           url: S.String,
           html_url: S.String,
           members_url: S.String,
@@ -15914,14 +15975,48 @@ function __c261(j: number): any {
           access_source: S.optional(S.String),
           organization_id: S.optional(S.Number),
           enterprise_id: S.optional(S.Number),
-          parent: S.NullOr(__S(4177, __c261, 1)),
+          parent: S.NullOr(__S(4161, __c260, 1)),
         }),
       ).annotate({ identifier: "Team" });
     case 3:
-      return S.Array(__S(4178, __c261, 2));
+      return S.Array(__S(4162, __c260, 2));
+  }
+}
+function __c261(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          owner: S.String.pipe(T.Label()),
+          repo: S.String.pipe(T.Label()),
+          per: S.optional(S.String.pipe(T.Query())),
+        }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/traffic/clones", code: 200 })),
+      ).annotate({ identifier: "GetClonesRequest" });
+    case 1:
+      return S.suspend(() =>
+        S.Struct({
+          count: S.Number,
+          uniques: S.Number,
+          clones: __S(4193, __c262, 1),
+        }),
+      ).annotate({ identifier: "CloneTraffic" });
   }
 }
 function __c262(j: number): any {
+  switch (j) {
+    case 0:
+      return S.suspend(() =>
+        S.Struct({
+          timestamp: S.String,
+          uniques: S.Number,
+          count: S.Number,
+        }),
+      ).annotate({ identifier: "Traffic" });
+    case 1:
+      return S.Array(__S(4192, __c262, 0));
+  }
+}
+function __c263(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15934,23 +16029,23 @@ function __c262(j: number): any {
       ).annotate({ identifier: "GetCodeFrequencyStatsRequest" });
   }
 }
-function __c263(j: number): any {
+function __c264(j: number): any {
   switch (j) {
     case 0:
-      return S.Array(__S(4224, __c264, 0));
+      return S.Array(__S(4240, __c265, 0));
     case 1:
-      return S.suspend(() => __S(4208, __c263, 0).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(4224, __c264, 0).pipe(T.RawResponseRoot())).annotate({
         identifier: "GetCodeFrequencyStatsResponse",
       });
   }
 }
-function __c264(j: number): any {
+function __c265(j: number): any {
   switch (j) {
     case 0:
       return S.Array(S.Number);
   }
 }
-function __c265(j: number): any {
+function __c266(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -15971,12 +16066,12 @@ function __c265(j: number): any {
         S.Struct({
           permission: S.String,
           role_name: S.String,
-          user: S.NullOr(__S(4257, __c266, 1)),
+          user: S.NullOr(__S(4273, __c267, 1)),
         }),
       ).annotate({ identifier: "RepositoryCollaboratorPermission" });
   }
 }
-function __c266(j: number): any {
+function __c267(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16011,14 +16106,14 @@ function __c266(j: number): any {
           received_events_url: S.String,
           type: S.String,
           site_admin: S.Boolean,
-          permissions: S.optional(__S(4256, __c266, 0)),
+          permissions: S.optional(__S(4272, __c267, 0)),
           role_name: S.String,
           user_view_type: S.optional(S.String),
         }),
       ).annotate({ identifier: "NullableCollaborator" });
   }
 }
-function __c267(j: number): any {
+function __c268(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16049,22 +16144,22 @@ function __c267(j: number): any {
         }),
       ).annotate({ identifier: "SimpleCommitStatus" });
     case 2:
-      return S.Array(__S(4273, __c267, 1));
+      return S.Array(__S(4289, __c268, 1));
     case 3:
       return S.suspend(() =>
         S.Struct({
           state: S.String,
-          statuses: __S(4274, __c267, 2),
+          statuses: __S(4290, __c268, 2),
           sha: S.String,
           total_count: S.Number,
-          repository: __S(3651, __c228, 3),
+          repository: __S(3619, __c226, 3),
           commit_url: S.String,
           url: S.String,
         }),
       ).annotate({ identifier: "CombinedCommitStatus" });
   }
 }
-function __c268(j: number): any {
+function __c269(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16074,11 +16169,16 @@ function __c268(j: number): any {
           ref: S.String.pipe(T.Label()),
           page: S.optional(S.Number.pipe(T.Query())),
           per_page: S.optional(S.Number.pipe(T.Query())),
+          accept: S.optional(S.String.pipe(T.Header("Accept"))),
         }).pipe(T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/commits/{ref}", code: 200 })),
       ).annotate({ identifier: "GetCommitRequest" });
+    case 1:
+      return S.suspend(() => S.Unknown.pipe(T.RawResponseRoot())).annotate({
+        identifier: "GetCommitResponse",
+      });
   }
 }
-function __c269(j: number): any {
+function __c270(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16092,20 +16192,20 @@ function __c269(j: number): any {
     case 1:
       return S.suspend(() =>
         S.Struct({
-          days: __S(4224, __c264, 0),
+          days: __S(4240, __c265, 0),
           total: S.Number,
           week: S.Number,
         }),
       ).annotate({ identifier: "CommitActivity" });
     case 2:
-      return S.Array(__S(4305, __c269, 1));
+      return S.Array(__S(4321, __c270, 1));
     case 3:
-      return S.suspend(() => __S(4306, __c269, 2).pipe(T.RawResponseRoot())).annotate({
+      return S.suspend(() => __S(4322, __c270, 2).pipe(T.RawResponseRoot())).annotate({
         identifier: "GetCommitActivityStatsResponse",
       });
   }
 }
-function __c270(j: number): any {
+function __c271(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16119,7 +16219,7 @@ function __c270(j: number): any {
       ).annotate({ identifier: "GetCommitCommentRequest" });
   }
 }
-function __c271(j: number): any {
+function __c272(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16137,7 +16237,7 @@ function __c271(j: number): any {
       ).annotate({ identifier: "GetCommitSignatureProtectionRequest" });
   }
 }
-function __c272(j: number): any {
+function __c273(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16158,13 +16258,13 @@ function __c272(j: number): any {
     case 2:
       return S.suspend(() =>
         S.Struct({
-          code_of_conduct: S.NullOr(__S(2608, __c163, 0)),
-          code_of_conduct_file: S.NullOr(__S(4353, __c272, 1)),
-          license: S.NullOr(__S(2592, __c162, 0)),
-          contributing: S.NullOr(__S(4353, __c272, 1)),
-          readme: S.NullOr(__S(4353, __c272, 1)),
-          issue_template: S.NullOr(__S(4353, __c272, 1)),
-          pull_request_template: S.NullOr(__S(4353, __c272, 1)),
+          code_of_conduct: S.NullOr(__S(2576, __c161, 0)),
+          code_of_conduct_file: S.NullOr(__S(4369, __c273, 1)),
+          license: S.NullOr(__S(2560, __c160, 0)),
+          contributing: S.NullOr(__S(4369, __c273, 1)),
+          readme: S.NullOr(__S(4369, __c273, 1)),
+          issue_template: S.NullOr(__S(4369, __c273, 1)),
+          pull_request_template: S.NullOr(__S(4369, __c273, 1)),
         }),
       ).annotate({ identifier: "CommunityProfileFiles" });
     case 3:
@@ -16173,14 +16273,14 @@ function __c272(j: number): any {
           health_percentage: S.Number,
           description: S.NullOr(S.String),
           documentation: S.NullOr(S.String),
-          files: __S(4354, __c272, 2),
+          files: __S(4370, __c273, 2),
           updated_at: S.NullOr(S.String),
           content_reports_enabled: S.optional(S.Boolean),
         }),
       ).annotate({ identifier: "CommunityProfile" });
   }
 }
-function __c273(j: number): any {
+function __c274(j: number): any {
   switch (j) {
     case 0:
       return S.suspend(() =>
@@ -16194,44 +16294,6 @@ function __c273(j: number): any {
     case 1:
       return S.suspend(() => S.Unknown.pipe(T.RawResponseRoot())).annotate({
         identifier: "GetContentResponse",
-      });
-  }
-}
-function __c274(j: number): any {
-  switch (j) {
-    case 0:
-      return S.suspend(() =>
-        S.Struct({
-          owner: S.String.pipe(T.Label()),
-          repo: S.String.pipe(T.Label()),
-        }).pipe(
-          T.Http({ method: "GET", uri: "/repos/{owner}/{repo}/stats/contributors", code: 200 }),
-        ),
-      ).annotate({ identifier: "GetContributorsStatsRequest" });
-    case 1:
-      return S.suspend(() =>
-        S.Struct({
-          w: S.optional(S.Number),
-          a: S.optional(S.Number),
-          d: S.optional(S.Number),
-          c: S.optional(S.Number),
-        }),
-      ).annotate({ identifier: "ContributorActivityWeeksItem" });
-    case 2:
-      return S.Array(__S(4385, __c274, 1));
-    case 3:
-      return S.suspend(() =>
-        S.Struct({
-          author: S.NullOr(__S(3568, __c223, 0)),
-          total: S.Number,
-          weeks: __S(4386, __c274, 2),
-        }),
-      ).annotate({ identifier: "ContributorActivity" });
-    case 4:
-      return S.Array(__S(4387, __c274, 3));
-    case 5:
-      return S.suspend(() => __S(4388, __c274, 4).pipe(T.RawResponseRoot())).annotate({
-        identifier: "GetContributorsStatsResponse",
       });
   }
 }

@@ -408,6 +408,13 @@ export interface SdkSpec {
       | {
           readonly protocol?: string;
           readonly contextType?: string;
+          /**
+           * The const's whole type annotation, e.g. an intersection of two
+           * `API.OperationMethod`s so a call's result type follows its input
+           * (GitHub's `Accept` media types). Replaces the default
+           * `API.OperationMethod<Input, Output, Error, Context>`.
+           */
+          readonly typeAnnotation?: string;
         }
       | undefined;
   };
@@ -471,13 +478,13 @@ export const generateService = (model: any, spec: SdkSpec): GeneratedService => 
     if (op.def.traits) opTraitsFor[input] = op.def.traits;
   }
 
-  if (selected.length === 0) return { code: "", operations: 0 };
+  // A model with no operations still emits when the provider roots shapes
+  // of its own: GitHub's webhook payloads are types with no operation.
+  const extraRoots = [...(spec.extraRoots?.(selected, shapes) ?? [])];
+  if (selected.length === 0 && extraRoots.length === 0) return { code: "", operations: 0 };
 
   // 2. Reachability + dependencies-first order (cycles suspend at refs).
-  const roots = [
-    ...selected.flatMap((op) => [op.def.__input, op.def.__output]),
-    ...(spec.extraRoots?.(selected, shapes) ?? []),
-  ];
+  const roots = [...selected.flatMap((op) => [op.def.__input, op.def.__output]), ...extraRoots];
   const reachable = reachableFrom(shapes, roots, shapeDeps);
   const order = topoOrder(shapes, reachable, shapeDeps);
   const indexOf = orderIndex(order);
@@ -1089,13 +1096,14 @@ export const generateService = (model: any, spec: SdkSpec): GeneratedService => 
         ? paginatedItemTsType(ctx.op.def.__output, paginatedItemsPath.get(ctx.op.id) ?? "")
         : undefined;
       const typeAnnotation =
+        overrides?.typeAnnotation ??
         `API.${paginated ? "PaginatedOperationMethod" : "OperationMethod"}<\n` +
-        `  ${ctx.inputName},\n` +
-        `  ${ctx.outputTsType},\n` +
-        `  ${ctx.opName}Error,\n` +
-        `  ${contextType}` +
-        (itemTsType ? `,\n  ${itemTsType}\n` : `\n`) +
-        `>`;
+          `  ${ctx.inputName},\n` +
+          `  ${ctx.outputTsType},\n` +
+          `  ${ctx.opName}Error,\n` +
+          `  ${contextType}` +
+          (itemTsType ? `,\n  ${itemTsType}\n` : `\n`) +
+          `>`;
       const protocol =
         (paginated && opProfile.get(ctx.op.id)?.protocol) || overrides?.protocol || decl.protocol;
       usedProtocols.add(protocol);
@@ -1123,7 +1131,9 @@ export const generateService = (model: any, spec: SdkSpec): GeneratedService => 
           // `makePaginated` infers the items element from the structural
           // fallback; an explicit item type needs the same `as any as`
           // idiom the schema consts use.
-          castToAnnotation: itemTsType !== undefined,
+          // An overridden annotation (overloads) is narrower than what
+          // `API.make` infers from the schemas, by construction.
+          castToAnnotation: itemTsType !== undefined || overrides?.typeAnnotation !== undefined,
         }),
       ].join("\n");
     });
