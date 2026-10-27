@@ -4,6 +4,7 @@ import * as C from "@distilled.cloud/core/category";
 import * as S from "@distilled.cloud/core/schema-lite";
 import * as __L from "@distilled.cloud/core/schema-lite";
 import type * as Redacted from "effect/Redacted";
+import { paginateLink } from "../pagination.ts";
 import { GithubProtocol, type GithubOpError, type GithubOpContext } from "../protocol.ts";
 import * as Retry from "../retry.ts";
 import * as T from "../traits.ts";
@@ -1199,54 +1200,69 @@ export const getScanHistory: API.OperationMethod<
 
 export type ListAlertsForOrgError = NotFound | GithubOpError;
 /** List secret scanning alerts for an organization Lists secret scanning alerts for eligible repositories in an organization, from newest to oldest. The authenticated user must be an administrator or security manager for the organization to use this endpoint. OAuth app tokens and personal access tokens (classic) need the `repo` or `security_events` scope to use this endpoint. If this endpoint is only used with public repositories, the token can use the `public_repo` scope instead. */
-export const listAlertsForOrg: API.OperationMethod<
+export const listAlertsForOrg: API.PaginatedOperationMethod<
   ListAlertsForOrgRequest,
   ListAlertsForOrgResponse,
   ListAlertsForOrgError,
-  GithubOpContext
-> = /*@__PURE__*/ API.make(() => ({
-  input: __S(32, __c4, 0) as any as S.Schema<ListAlertsForOrgRequest>,
-  output: __S(36, __c4, 4) as any as S.Schema<ListAlertsForOrgResponse>,
-  errors: [NotFound],
-  protocol: GithubProtocol,
-  retry: Retry.Retry,
-  telemetry: TELEMETRY,
-  span: "ListAlertsForOrg",
-}));
+  GithubOpContext,
+  OrganizationSecretScanningAlert
+> = /*@__PURE__*/ API.makePaginated(
+  () => ({
+    input: __S(32, __c4, 0) as any as S.Schema<ListAlertsForOrgRequest>,
+    output: __S(36, __c4, 4) as any as S.Schema<ListAlertsForOrgResponse>,
+    errors: [NotFound],
+    protocol: GithubProtocol,
+    retry: Retry.Retry,
+    telemetry: TELEMETRY,
+    span: "ListAlertsForOrg",
+    pagination: { mode: "link", inputToken: "page", pageSize: "per_page", items: "body" } as const,
+  }),
+  paginateLink,
+) as any;
 
 export type ListAlertsForRepoError = NotFound | GithubOpError;
 /** List secret scanning alerts for a repository Lists secret scanning alerts for an eligible repository, from newest to oldest. The authenticated user must be an administrator for the repository or for the organization that owns the repository to use this endpoint. OAuth app tokens and personal access tokens (classic) need the `repo` or `security_events` scope to use this endpoint. If this endpoint is only used with public repositories, the token can use the `public_repo` scope instead. */
-export const listAlertsForRepo: API.OperationMethod<
+export const listAlertsForRepo: API.PaginatedOperationMethod<
   ListAlertsForRepoRequest,
   ListAlertsForRepoResponse,
   ListAlertsForRepoError,
-  GithubOpContext
-> = /*@__PURE__*/ API.make(() => ({
-  input: __S(40, __c5, 0) as any as S.Schema<ListAlertsForRepoRequest>,
-  output: __S(43, __c5, 3) as any as S.Schema<ListAlertsForRepoResponse>,
-  errors: [NotFound],
-  protocol: GithubProtocol,
-  retry: Retry.Retry,
-  telemetry: TELEMETRY,
-  span: "ListAlertsForRepo",
-}));
+  GithubOpContext,
+  SecretScanningAlert
+> = /*@__PURE__*/ API.makePaginated(
+  () => ({
+    input: __S(40, __c5, 0) as any as S.Schema<ListAlertsForRepoRequest>,
+    output: __S(43, __c5, 3) as any as S.Schema<ListAlertsForRepoResponse>,
+    errors: [NotFound],
+    protocol: GithubProtocol,
+    retry: Retry.Retry,
+    telemetry: TELEMETRY,
+    span: "ListAlertsForRepo",
+    pagination: { mode: "link", inputToken: "page", pageSize: "per_page", items: "body" } as const,
+  }),
+  paginateLink,
+) as any;
 
 export type ListLocationsForAlertError = NotFound | GithubOpError;
 /** List locations for a secret scanning alert Lists all locations for a given secret scanning alert for an eligible repository. The authenticated user must be an administrator for the repository or for the organization that owns the repository to use this endpoint. OAuth app tokens and personal access tokens (classic) need the `repo` or `security_events` scope to use this endpoint. If this endpoint is only used with public repositories, the token can use the `public_repo` scope instead. */
-export const listLocationsForAlert: API.OperationMethod<
+export const listLocationsForAlert: API.PaginatedOperationMethod<
   ListLocationsForAlertRequest,
   ListLocationsForAlertResponse,
   ListLocationsForAlertError,
-  GithubOpContext
-> = /*@__PURE__*/ API.make(() => ({
-  input: __S(48, __c6, 0) as any as S.Schema<ListLocationsForAlertRequest>,
-  output: __S(51, __c6, 3) as any as S.Schema<ListLocationsForAlertResponse>,
-  errors: [NotFound],
-  protocol: GithubProtocol,
-  retry: Retry.Retry,
-  telemetry: TELEMETRY,
-  span: "ListLocationsForAlert",
-}));
+  GithubOpContext,
+  SecretScanningLocation
+> = /*@__PURE__*/ API.makePaginated(
+  () => ({
+    input: __S(48, __c6, 0) as any as S.Schema<ListLocationsForAlertRequest>,
+    output: __S(51, __c6, 3) as any as S.Schema<ListLocationsForAlertResponse>,
+    errors: [NotFound],
+    protocol: GithubProtocol,
+    retry: Retry.Retry,
+    telemetry: TELEMETRY,
+    span: "ListLocationsForAlert",
+    pagination: { mode: "link", inputToken: "page", pageSize: "per_page", items: "body" } as const,
+  }),
+  paginateLink,
+) as any;
 
 export type ListOrgCustomPatternsError = Forbidden | NotFound | GithubOpError;
 /** List organization custom patterns Lists secret scanning custom patterns for an organization. Personal access tokens (classic) need the `read:org` scope to use this endpoint. */
